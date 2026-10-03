@@ -153,5 +153,37 @@ const tags = s => [...new Set([...String(s).matchAll(/<\/?(\w+)/g)].map(m => m[1
   report(!stale.length, 'index.html loads the current shabbat.js and i18n.js (their URLs carry the content hash)' + (stale.length ? `  (out of date: ${stale}; run npm run stamp)` : ''));
 }
 
+// 11. The embedded text font (IBM Plex Sans Hebrew) has every character the page's text can show: the strings, the place
+//     and holiday names, the formatted times, dates and durations in both languages, and the static text in index.html.
+//     A character outside its unicode-range would quietly fall back to the system font.
+{
+  const faces = [...html.matchAll(/font-family: "Plex Text";[^}]*?unicode-range:\s*([^;]+);/g)];
+  const ranges = faces.flatMap(m => m[1].split(',').map(r => r.trim().replace(/^U\+/i, '').split('-').map(h => parseInt(h, 16))))
+    .map(([from, to]) => [from, to ?? from]);
+  const covered = ch => ranges.some(([from, to]) => ch.codePointAt(0) >= from && ch.codePointAt(0) <= to);
+  const used = new Map();                                                    // character -> where it was seen
+  const see = (where, text) => { for (const ch of String(text)) if (!/\s/.test(ch) && !used.has(ch)) used.set(ch, where); };
+  const S = Shabbat.create('tel-aviv');
+  const t0 = Date.UTC(2026, 9, 3, 16, 0), today = S.civilDay(t0);
+  for (const code of ['en', 'he']) {
+    const L = I18N.create(code), f = L.format('Asia/Jerusalem');
+    for (const [key, value] of Object.entries(I18N.LANGS[code].strings)) if (typeof value === 'string') see(`${code} ${key}`, value.replace(/<[^>]*>/g, ''));
+    for (const place of Object.values(Shabbat.PLACES)) see(`${code} place`, L.placeName(place));
+    for (const dt of [0, 36e5, 864e5, -864e5, 3 * 864e5, 40 * 864e5, -40 * 864e5]) see(`${code} when`, f.when(t0 + dt, today, S.civilDay));
+    for (const ms of [1000, 59e3, 61e3, 3600e3, 3660e3, 7320e3, 86400e3, 90000e3, 172800e3]) see(`${code} span`, f.span(ms));
+    see(`${code} time`, f.time(t0)); see(`${code} date`, f.date(t0)); see(`${code} seconds`, f.seconds(t0));
+    see(`${code} coords`, f.coords(32.087, 34.887)); see(`${code} lift`, f.lift(90)); see(`${code} day`, f.dayLabel(today));
+    for (const israel of [true, false]) {
+      const T = Shabbat.create({ ...Shabbat.PLACES['tel-aviv'], israel });
+      for (let d = today; d < today + 400; d++) for (const item of T.itemsOn(d)) see(`${code} holiday`, L.itemName(item));
+    }
+  }
+  const page = html.slice(html.indexOf('<body>')).replace(/<script[\s\S]*?<\/script>/g, '').replace(/<style[\s\S]*?<\/style>/g, '').replace(/<[^>]*>/g, ' ');
+  see('index.html', page);
+  const missing = [...used].filter(([ch]) => !covered(ch)).map(([ch, where]) => `${JSON.stringify(ch)} U+${ch.codePointAt(0).toString(16).toUpperCase().padStart(4, '0')} (${where})`);
+  report(faces.length === 4 && used.size > 100 && !missing.length, `the embedded text font covers all ${used.size} characters the page's text uses` +
+    (missing.length ? `  (not covered: ${missing}; cut the font again with them, see the README)` : '') + (faces.length !== 4 ? `  (found ${faces.length} Plex Text faces, expected 4)` : ''));
+}
+
 console.log(failed ? `\n${failed} check(s) failed` : '\nall checks passed');
 process.exit(failed ? 1 : 0);

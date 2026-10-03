@@ -19,7 +19,7 @@ Switching language fades the words and buttons out, flips the language and direc
 
 **Install button.** Between the **?** and the gear: it installs the page as an app (Chrome shows its own prompt; Safari on iOS has none, so it shows the steps), and is hidden where the browser cannot install and once the app is installed.
 
-**As an app.** The page installs (Chrome: Install; Safari on iOS: Share, then Add to Home Screen), opens on its own with its icon, a red no-sign with a black ש, and opens with no network once it has been opened with one. [`sw.js`](sw.js) keeps the page, its two scripts and its icons on the device. The page is asked for fresh every time, so an update arrives at once; if the network fails, answers with an error or takes more than 3 seconds, the kept copy is shown. A script is kept by its hash (`?v=`), so a kept copy is always the right one, and the old copy goes when a new hash arrives. The icons are drawn by [`tools/icons.mjs`](tools/icons.mjs) (`npm install --no-save @resvg/resvg-js`, then `node tools/icons.mjs`): a round one for the browser tab, a cream rounded one for "any", a full-bleed one for "maskable" with the sign inside the circle every launcher keeps, and the opaque 180 px one iOS wants. On a phone that can install it, a card slides up after a few seconds: Chrome gets an Install button that opens its own prompt, Safari on iOS gets the steps (Share, then Add to Home Screen). Not now keeps it quiet for two weeks; the install button by the settings works any time. `?install=ios` or `?install=android` shows the card on any device, to preview it. On iOS the home-screen app has its own cookies, so its settings are set there once.
+**As an app.** The page installs (Chrome: Install; Safari on iOS: Share, then Add to Home Screen), opens on its own with its icon, a red no-sign with a black ש (David Libre Bold, on top of the bar), and opens with no network once it has been opened with one. [`sw.js`](sw.js) keeps the page, its two scripts and its icons on the device. The page is asked for fresh every time, so an update arrives at once; if the network fails, answers with an error or takes more than 3 seconds, the kept copy is shown. A script is kept by its hash (`?v=`), so a kept copy is always the right one, and the old copy goes when a new hash arrives. The icons are drawn by [`tools/icons.mjs`](tools/icons.mjs) (`npm install --no-save @resvg/resvg-js`, then `node tools/icons.mjs`): a round one for the browser tab, a cream rounded one for "any", a full-bleed one for "maskable" with the sign inside the circle every launcher keeps, and the opaque 180 px one iOS wants. On a phone that can install it, a card slides up after a few seconds: Chrome gets an Install button that opens its own prompt, Safari on iOS gets the steps (Share, then Add to Home Screen). Not now keeps it quiet for two weeks; the install button by the settings works any time. `?install=ios` or `?install=android` shows the card on any device, to preview it. On iOS the home-screen app has its own cookies, so its settings are set there once.
 
 ## How the times are worked out
 
@@ -29,7 +29,7 @@ On the device, with no network. Shabbat and holiday times are pure astronomy and
 |---|---|---|---|---|
 | ask a site's API on every visit | a request per visit, a third party that can be down | no | no | tiny |
 | ship a table of times | none | yes | yes, it runs out | tens of KB |
-| **work it out on the device** (this) | none | yes | never | about 30 KB gzipped, fonts included |
+| **work it out on the device** (this) | none | yes | never | about 60 KB gzipped, fonts included |
 
 [`shabbat.js`](shabbat.js) is the NOAA / Meeus sun position (the form hebcal uses) plus the Hebrew calendar (Reingold & Dershowitz), with no dependencies.
 
@@ -63,7 +63,14 @@ All the page's text lives in [`i18n.js`](i18n.js), one key per string, the same 
 
 Styles use logical properties (`inset-inline-end`, `padding-inline-start`, `text-align: start`), so right to left is the exact mirror of left to right; Hebrew-only tweaks (no capitals, no letter spacing) sit under `:lang(he)`. A new language is a new entry in `LANGS` with `dir`, `locale`, its strings and a `format` function for times, dates and durations.
 
-The big answer and the title use a display font, embedded in `index.html`: **Syne ExtraBold** for English and **Rubik Black** for Hebrew, cut down to their letters (Latin letters, and Hebrew letters with the space and punctuation), about 10 KB in all, so there is no network request and it works offline. The answer shrinks to fit the screen. To cut them again (a new letter, or another font): `subset-font` on the `latin` and `hebrew` files of the `@fontsource` packages, then base64 into the three `@font-face` rules. Licenses are in `fonts/`.
+**Fonts**, all embedded in `index.html`, so there is no network request and it works offline:
+
+- The big answer and the title use a display font: **Syne ExtraBold** for English and **Rubik Black** for Hebrew, cut down to their letters (Latin letters, and Hebrew letters with the space and punctuation), about 10 KB in all. The answer shrinks to fit the screen.
+- The small texts (everything else, both languages) use **IBM Plex Sans Hebrew**, Regular and SemiBold (a bold request gets the SemiBold), with one face for the Latin letters and one for the Hebrew: about 27 KB, cut down to ASCII plus ` ° · × – — ’ “ ” … −` and the Hebrew letters, maqaf, geresh and gershayim. The `unicode-range` lines in the four `@font-face` rules are exactly what the files were cut to, and `npm test` fails if any text the page can show (the strings, place and holiday names, formatted times, dates and durations, in both languages) needs a character outside them, since it would quietly fall back to the system font.
+- To cut a font again (a new character, or another font): `subset-font` (with `targetFormat: 'woff2'` and `keepFeatures: ['kern', 'liga', 'ccmp', 'locl', 'mark', 'mkmk', 'rlig', 'calt']`) on the `latin` and `hebrew` woff2 files of the `@fontsource` package, with the characters in the `unicode-range` as the text; then base64 into the `@font-face` rules and update the ranges.
+- The ש in the app icon is David Libre Bold, outlined (see `tools/icons.mjs`).
+
+Licenses are in `fonts/`.
 
 ## Using it from code
 
@@ -95,7 +102,7 @@ Add it to `PLACES` in `shabbat.js` and it appears in the settings. `havdalahMinu
 
 ## Files
 
-- `index.html`: the page (markup, styles, the settings, the "?" panel, the embedded display fonts)
+- `index.html`: the page (markup, styles, the settings, the "?" panel, the install card, the embedded fonts)
 - `shabbat.js`: the times, holidays, runs and state, no dependencies
 - `i18n.js`: the text in Hebrew and English, and the grammar and formatting each needs
 - `manifest.webmanifest`, `sw.js`, `icons/`: the app: its name and icons, the offline service worker, the icon files
@@ -104,4 +111,4 @@ Add it to `PLACES` in `shabbat.js` and it appears in the settings. `havdalahMinu
 - `test/i18n.mjs`: checks the text, the Hebrew grammar and the fonts' letters
 - `test/pwa.mjs`: checks the manifest, the icons, the links and the service worker
 - `test/compare-csv.mjs`: checks against a table copied from any website
-- `fonts/`: licenses of the display fonts (SIL Open Font License 1.1)
+- `fonts/`: licenses of the fonts (display, text, and the icon's ש), all SIL Open Font License 1.1

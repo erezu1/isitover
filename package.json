@@ -1,0 +1,12 @@
+{
+  "name": "shabos",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Is Shabbat (or the holiday) over in Tel Aviv? Computed on the device, checked against hebcal.",
+  "scripts": {
+    "test": "node test/verify.mjs"
+  },
+  "devDependencies": {
+    "@hebcal/core": "^6.11.1"
+  }
+}

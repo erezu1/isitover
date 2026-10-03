@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Shabbat in Tel Aviv</title>
+<meta name="description" content="Has Shabbat (or the holiday) ended? Worked out on your device, no network needed.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%95%AF%3C/text%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #faf8f4; --fg: #1d1b17; --muted: #6a655b; --line: #e3ddd0;
+    --yes: #146c36; --no: #a84a07; --none: #475569;
+    --yes-bg: #dcf2e3; --no-bg: #fbe8d2; --none-bg: #e8e6df; --accent: #1d1b17; --on-accent: #faf8f4;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #13120e; --fg: #f2eee5; --muted: #a39d90; --line: #2a2822;
+      --yes: #6ee09a; --no: #ffb066; --none: #a5b0c0;
+      --yes-bg: #16301f; --no-bg: #3a2612; --none-bg: #25231d; --accent: #f2eee5; --on-accent: #13120e;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg);
+    font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-variant-numeric: tabular-nums;
+  }
+  main {
+    min-height: 100vh; min-height: 100dvh; max-width: 36rem; margin: 0 auto;
+    padding: 56px 16px 32px; display: flex; flex-direction: column; justify-content: center;
+  }
+  :focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+
+  .gear {
+    position: fixed; top: 8px; right: 8px; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%;
+    display: grid; place-items: center; background: transparent; color: var(--muted); cursor: pointer;
+  }
+  .gear:hover { background: var(--none-bg); color: var(--fg); }
+  .gear svg { width: 24px; height: 24px; fill: currentColor; }
+
+  .q { margin: 0; color: var(--muted); font-size: 1.05rem; }
+  .answer {
+    margin: .1em 0 .15em; font-weight: 800; line-height: 1; letter-spacing: -.045em;
+    font-size: clamp(5rem, 28vw, 10rem);
+  }
+  .answer.none { font-size: clamp(3.2rem, 16vw, 6.5rem); letter-spacing: -.035em; }
+  .answer.in { color: var(--no); }
+  .answer.out { color: var(--yes); }
+  .answer.none { color: var(--none); }
+  .status { margin: .5rem 0 0; font-size: 1.2rem; font-weight: 600; display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; }
+  .pill { font-size: .75rem; font-weight: 700; letter-spacing: .08em; padding: .15rem .6rem; border-radius: 999px; }
+  .pill.in { background: var(--no-bg); color: var(--no); }
+  .pill.out { background: var(--yes-bg); color: var(--yes); }
+  .pill.none { background: var(--none-bg); color: var(--none); }
+  .detail { margin: .2rem 0 0; color: var(--muted); }
+  .mode { margin: .2rem 0 0; color: var(--muted); font-size: .9rem; }
+  h2.small { margin: 2.2rem 0 .4rem; font-size: .8rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  ul { list-style: none; margin: 0; padding: 0; }
+  li { padding: .6rem 0; border-top: 1px solid var(--line); }
+  li b { display: block; font-weight: 600; }
+  li span { color: var(--muted); font-size: .95rem; }
+  footer { margin-top: 2rem; color: var(--muted); font-size: .85rem; }
+  footer p { margin: .3rem 0; }
+  .sim { display: inline-block; margin: 0 0 1rem; padding: .2rem .6rem; border-radius: 6px; background: var(--no-bg); color: var(--no); font-size: .85rem; font-weight: 600; }
+  .sim[hidden] { display: none; }
+
+  dialog {
+    width: min(92vw, 24rem); padding: 20px; border: 1px solid var(--line); border-radius: 16px;
+    background: var(--bg); color: var(--fg); box-shadow: 0 12px 40px rgba(0, 0, 0, .25);
+  }
+  dialog::backdrop { background: rgba(0, 0, 0, .45); }
+  dialog h2 { margin: 0 0 1rem; font-size: 1.25rem; }
+  .field { display: block; margin: 0 0 1rem; padding: 0; border: 0; }
+  .field > span, .field legend { display: block; margin: 0 0 .3rem; padding: 0; font-size: .8rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  select {
+    width: 100%; padding: .6rem .7rem; font: inherit; color: var(--fg); background: var(--bg);
+    border: 1px solid var(--muted); border-radius: 10px;
+  }
+  .choice { display: flex; gap: .6rem; align-items: flex-start; padding: .35rem 0; cursor: pointer; }
+  .choice input { margin: .3rem 0 0; width: 1.1rem; height: 1.1rem; accent-color: var(--accent); }
+  .choice small { display: block; color: var(--muted); font-size: .85rem; }
+  .spaced { margin-bottom: 1rem; }
+  .note { margin: 0 0 1rem; color: var(--muted); font-size: .85rem; }
+  .actions { display: flex; justify-content: space-between; gap: .6rem; }
+  .actions button {
+    padding: .6rem 1.1rem; font: inherit; font-weight: 600; border-radius: 10px; cursor: pointer;
+    border: 1px solid var(--muted); background: transparent; color: var(--fg);
+  }
+  .actions .primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+</style>
+</head>
+<body>
+<button class="gear" id="gear" type="button" aria-label="Settings" title="Settings">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.48.48 0 0 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+</button>
+
+<main>
+  <p class="sim" id="sim" hidden></p>
+  <p class="q" id="q">Has Shabbat ended in Tel Aviv?</p>
+  <p class="answer none" id="answer" role="status" aria-live="polite">…</p>
+  <p class="status"><span class="pill none" id="pill"></span><span id="what"></span></p>
+  <p class="detail" id="detail"></p>
+  <p class="mode" id="mode"></p>
+
+  <h2 class="small" id="listTitle">Coming up</h2>
+  <ul id="list"></ul>
+
+  <footer>
+    <p id="clock"></p>
+    <p id="rules"></p>
+    <noscript><p>This page needs JavaScript to work out the times.</p></noscript>
+  </footer>
+</main>
+
+<dialog id="settings" aria-labelledby="settingsTitle">
+  <form method="dialog">
+    <h2 id="settingsTitle">Settings</h2>
+
+    <label class="field"><span>Place</span><select id="place"></select></label>
+
+    <fieldset class="field">
+      <legend>Holidays</legend>
+      <label class="choice"><input type="radio" name="israel" value="1"><span>Israel<small>one day of Yom Tov</small></span></label>
+      <label class="choice"><input type="radio" name="israel" value="0"><span>Diaspora<small>two days of Yom Tov</small></span></label>
+    </fieldset>
+
+    <label class="choice spaced"><input type="checkbox" id="rt"><span>Rabbeinu Tam<small>Shabbat and holidays end 72 minutes after sunset, later than usual</small></span></label>
+
+    <p class="note">Saved in a cookie on this device.</p>
+    <div class="actions">
+      <button type="button" id="reset">Reset</button>
+      <button class="primary" value="close">Done</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="shabbat.js"></script>
+<script>
+(function () {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const set = (id, text) => { const el = $(id); if (el.textContent !== text) el.textContent = text; };
+
+  // ---- settings, kept in a cookie ------------------------------------------------------------------
+  const DEFAULTS = { place: 'tel-aviv', israel: true, rt: false };
+  const COOKIE = 'shabos';
+  const cookiePath = location.pathname.replace(/[^/]*$/, '') || '/';
+
+  function loadSettings() {
+    const s = Object.assign({}, DEFAULTS);
+    try {
+      const raw = document.cookie.split('; ').find(c => c.startsWith(COOKIE + '='));
+      if (raw) {
+        const q = new URLSearchParams(raw.slice(COOKIE.length + 1));
+        if (Shabbat.PLACES[q.get('place')]) s.place = q.get('place');
+        if (q.has('israel')) s.israel = q.get('israel') === '1';
+        if (q.has('rt')) s.rt = q.get('rt') === '1';
+      }
+    } catch (e) { /* no cookies: the defaults */ }
+    return s;
+  }
+  function saveSettings() {
+    try {
+      const value = new URLSearchParams({ place: settings.place, israel: settings.israel ? 1 : 0, rt: settings.rt ? 1 : 0 });
+      document.cookie = COOKIE + '=' + value + '; max-age=31536000; path=' + cookiePath + '; SameSite=Lax' +
+        (location.protocol === 'https:' ? '; Secure' : '');
+    } catch (e) { /* the page still works, it just forgets */ }
+  }
+  function forgetSettings() {
+    try { document.cookie = COOKIE + '=; max-age=0; path=' + cookiePath; } catch (e) { /* ignore */ }
+  }
+
+  // ---- the engine for the current settings ---------------------------------------------------------
+  let settings = loadSettings(), S, tfmt, dfmt, listKey = '';
+  function useSettings() {
+    const place = Object.assign({}, Shabbat.PLACES[settings.place], { israel: settings.israel });
+    if (settings.rt) place.havdalahMinutes = 72;           // Rabbeinu Tam
+    S = Shabbat.create(place);
+    tfmt = new Intl.DateTimeFormat('en-GB', { timeZone: S.place.tz, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+    dfmt = new Intl.DateTimeFormat('en-GB', { timeZone: S.place.tz, weekday: 'short', day: 'numeric', month: 'short' });
+    listKey = '';
+  }
+  const time = ms => tfmt.format(ms);
+  const date = ms => dfmt.format(ms);
+
+  // ?now=2026-10-03T19:06:00+03:00 pretends it is that moment, to preview each state.
+  let skew = 0, simulated = false;
+  const asked = new URLSearchParams(location.search).get('now');
+  if (asked && isFinite(Date.parse(asked))) { skew = Date.parse(asked) - Date.now(); simulated = true; }
+
+  const when = (ms, today) => {
+    const diff = S.civilDay(ms) - today;
+    return (diff === 0 ? 'today' : diff === 1 ? 'tomorrow' : diff === -1 ? 'yesterday' : date(ms)) + ' ' + time(ms);
+  };
+  const span = ms => {
+    const m = Math.round(Math.abs(ms) / 60000);
+    if (m < 1) return 'less than a minute';
+    if (m < 60) return m + ' min';
+    const h = Math.floor(m / 60);
+    if (h < 48) return h + ' h' + (m % 60 ? ' ' + (m % 60) + ' min' : '');
+    return Math.floor(h / 24) + ' days';
+  };
+  const name = p => p.names.join(' + ');
+  const hm = s => +s.slice(0, 2) * 60 + +s.slice(3);
+
+  function rules(P) {
+    const end = P.havdalahMinutes != null
+      ? 'Rabbeinu Tam: it ends ' + P.havdalahMinutes + ' minutes after sunset'
+      : 'It ends when the sun is ' + P.havdalahDegrees + '° below the horizon';
+    return 'Candle lighting is ' + P.candleMinutes + ' minutes before sunset, rounded earlier. ' + end +
+      ', rounded up to the next minute. Rounded the stringent way, matching the Tel Aviv table of yeshiva.org.il; ' +
+      'hebcal.com can show the end a minute earlier. Holidays: ' +
+      (P.israel ? 'one day, as in Israel.' : 'two days, as in the Diaspora.');
+  }
+
+  function render() {
+    const now = Date.now() + skew;
+    const st = S.status(now), p = st.period, today = st.today, where = S.place.name;
+
+    const answer = st.state === 'in' ? 'no' : st.state === 'out' ? 'yes' : 'not shabat';
+    set('q', st.state === 'none' ? 'Has Shabbat ended in ' + where + '?' : 'Has ' + name(p) + ' ended in ' + where + '?');
+    set('answer', answer);
+    $('answer').className = 'answer ' + st.state;
+    $('pill').className = 'pill ' + st.state;
+    set('pill', st.state === 'in' ? 'IN' : st.state === 'out' ? 'OUT' : 'NEXT');
+    set('what', name(p));
+    if (st.state === 'in') {
+      set('detail', 'Began ' + when(p.start, today) + ' · ends ' + when(p.end, today) + ' (in ' + span(st.untilEnd) + ')');
+    } else if (st.state === 'out') {
+      set('detail', 'Ended ' + when(p.end, today) + ' (' + span(-st.untilEnd) + ' ago)');
+    } else {
+      set('detail', 'Starts ' + when(p.start, today) + ' (in ' + span(st.untilStart) + ') · ends ' + when(p.end, today));
+    }
+    set('mode', settings.rt ? 'Rabbeinu Tam: ends ' + S.place.havdalahMinutes + ' minutes after sunset' : '');
+    document.title = answer + ' · Shabbat in ' + where;
+
+    set('listTitle', st.state === 'none' ? 'After that' : 'Coming up');
+    const key = st.upcoming.map(u => u.start).join();
+    if (key !== listKey) {
+      listKey = key;
+      $('list').replaceChildren(...st.upcoming.map(u => {
+        const li = document.createElement('li'), b = document.createElement('b'), s = document.createElement('span');
+        b.textContent = name(u);
+        s.textContent = date(u.start) + ' ' + time(u.start) + '  →  ' + date(u.end) + ' ' + time(u.end);
+        li.append(b, s);
+        return li;
+      }));
+    }
+
+    let clock = 'Times are ' + where + ' time, which is ' + time(now) + ' there now.';
+    const off = ((hm(time(now)) - (new Date(now).getHours() * 60 + new Date(now).getMinutes()) + 1440 + 720) % 1440) - 720;
+    if (off) clock += ' Your clock is ' + (off % 60 ? Math.abs(off) + ' min' : Math.abs(off) / 60 + ' h') + (off > 0 ? ' behind.' : ' ahead.');
+    set('clock', clock);
+    set('rules', rules(S.place));
+    $('sim').hidden = !simulated;
+    set('sim', 'Simulated time: ' + date(now) + ' ' + time(now));
+  }
+
+  // ---- the settings dialog -------------------------------------------------------------------------
+  const dialog = $('settings');
+  $('place').replaceChildren(...Object.keys(Shabbat.PLACES).map(key => {
+    const o = document.createElement('option');
+    o.value = key; o.textContent = Shabbat.PLACES[key].name;
+    return o;
+  }));
+  function showSettings() {
+    $('place').value = settings.place;
+    for (const r of document.querySelectorAll('input[name=israel]')) r.checked = (r.value === '1') === settings.israel;
+    $('rt').checked = settings.rt;
+  }
+  function changed() {
+    useSettings();
+    saveSettings();
+    render();
+  }
+  $('gear').addEventListener('click', () => {
+    showSettings();
+    if (typeof dialog.showModal === 'function') dialog.showModal(); else dialog.setAttribute('open', '');
+  });
+  $('place').addEventListener('change', e => {
+    settings.place = e.target.value;
+    settings.israel = !!Shabbat.PLACES[settings.place].israel;   // each place starts with its own holiday schedule
+    showSettings();
+    changed();
+  });
+  for (const r of document.querySelectorAll('input[name=israel]')) r.addEventListener('change', e => { settings.israel = e.target.value === '1'; changed(); });
+  $('rt').addEventListener('change', e => { settings.rt = e.target.checked; changed(); });
+  $('reset').addEventListener('click', () => {
+    settings = Object.assign({}, DEFAULTS);
+    forgetSettings();
+    showSettings();
+    useSettings();
+    render();
+  });
+  dialog.addEventListener('click', e => {                        // a click on the backdrop closes it
+    const r = dialog.getBoundingClientRect();
+    if (e.target === dialog && (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom)) dialog.close();
+  });
+
+  try {
+    useSettings();
+    render();
+    setInterval(render, 1000);
+    document.addEventListener('visibilitychange', render);
+  } catch (e) {
+    set('answer', '?');
+    set('detail', 'This browser cannot work out the times (' + e.message + ').');
+  }
+})();
+</script>
+</body>
+</html>

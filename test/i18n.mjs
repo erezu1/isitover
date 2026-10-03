@@ -75,8 +75,8 @@ const tags = s => [...new Set([...String(s).matchAll(/<\/?(\w+)/g)].map(m => m[1
   const want = [
     [L.t('title.shabbat'), 'האם יצאה שבת?'], [L.t('title.chag'), 'האם יצא החג?'],
     [L.t('answer.in'), 'לא'], [L.t('answer.out'), 'כן'], [L.t('answer.none'), 'לא'],
-    [L.t('tag.in.shabbat'), 'נכנסה'], [L.t('tag.out.shabbat'), 'יצאה'], [L.t('tag.none.shabbat'), 'תצא'],
-    [L.t('tag.in.chag'), 'נכנס'], [L.t('tag.out.chag'), 'יצא'], [L.t('tag.none.chag'), 'יצא'],
+    [L.t('tag.in.shabbat'), 'בתוקף'], [L.t('tag.out.shabbat'), 'יצאה'], [L.t('tag.none.shabbat'), 'תצא'],
+    [L.t('tag.in.chag'), 'בתוקף'], [L.t('tag.out.chag'), 'יצא'], [L.t('tag.none.chag'), 'יצא'],
     [En.t('title.shabbat'), 'Is it over?'], [En.t('title.chag'), 'Is it over?'],
     [En.t('answer.in'), 'no'], [En.t('answer.out'), 'yes'], [En.t('answer.none'), 'not shabat'],
   ];

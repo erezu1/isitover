@@ -4,13 +4,13 @@
 
 | It is… | Hebrew | English | And under it |
 |---|---|---|---|
-| Shabbat or a holiday where work is forbidden, still on (from candle lighting) | **לא** | **no** | `נכנסה` / `IN` · which one · when it began, when it ends, how long to go |
+| Shabbat or a holiday where work is forbidden, still on (from candle lighting) | **לא** | **no** | `בתוקף` / `IN` · which one · when it began, when it ends, how long to go |
 | It ended earlier today, after nightfall | **כן** | **yes** | `יצאה` / `OUT` · which one · when it ended, how long ago |
 | Neither | **לא** | **not shabat** | `תצא` / `NEXT` · the next one and when it starts |
 
 Holidays are the days on which work is forbidden: Rosh Hashana, Yom Kippur, Sukkot, Shmini Atzeret / Simchat Torah, Pesach (first and seventh days), Shavuot. Back-to-back days (a holiday on Friday, then Shabbat) are one unbroken period. The page works in Tel Aviv time wherever you open it.
 
-**The Hebrew title** asks about Shabbat while Shabbat is on (**האם יצאה שבת?**), and about the holiday once Shabbat is out but the holiday is still on (**האם יצא החג?**); otherwise it asks about the last one, or the next one if nothing has started. A Saturday that is also a holiday counts as Shabbat. The verbs in the tags and in the line under them agree with it: feminine for Shabbat, masculine for a holiday. The English title is always "Is it over?" and its line talks about the whole period.
+**The Hebrew title** asks about Shabbat while Shabbat is on (**האם יצאה שבת?**), and about the holiday once Shabbat is out but the holiday is still on (**האם יצא החג?**); otherwise it asks about the last one, or the next one if nothing has started. A Saturday that is also a holiday counts as Shabbat. The verbs in the line under the name, and in the tags for "ended" and "next", agree with it: feminine for Shabbat, masculine for a holiday. The tag for "on" is the neutral **בתוקף**. The English title is always "Is it over?" and its line talks about the whole period.
 
 Two buttons at the top (the top right in English, the top left in Hebrew, since the whole layout mirrors), each opening a panel that fades in and out:
 

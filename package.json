@@ -1,8 +1,8 @@
 {
-  "name": "shabos",
+  "name": "isitover",
   "version": "1.0.0",
   "private": true,
-  "description": "Is Shabbat (or the holiday) over in Tel Aviv? Computed on the device, checked against hebcal.",
+  "description": "Is it over? Has Shabbat (or the holiday) ended? Computed on the device, checked against hebcal.",
   "scripts": {
     "test": "node test/verify.mjs"
   },

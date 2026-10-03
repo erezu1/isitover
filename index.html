@@ -4,10 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
-<title>Shabbat in Tel Aviv</title>
-<meta name="description" content="Has Shabbat (or the holiday) ended? Worked out on your device, no network needed.">
+<title>Is it over?</title>
+<meta name="description" content="Is it over? Has Shabbat or the holiday ended? Worked out on your device, no network needed.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%95%AF%3C/text%3E%3C/svg%3E">
 <style>
+  /* The title font is Syne ExtraBold (SIL Open Font License 1.1, see fonts/OFL-Syne.txt), cut down to the letters
+     of "Is it over?" and embedded, so it needs no network. Any other letter falls back to the system font. */
+  @font-face {
+    font-family: "Syne Title"; font-style: normal; font-weight: 800; font-display: swap;
+    src: url(data:font/woff2;base64,d09GMgABAAAAAAUwABAAAAAACcgAAATVAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGhwbgW4cgUoGYD9TVEFUKgBsEQgKhgCEYAsgAAE2AiQDPAQgBYNkByAMBxvyB8geh+kGe3ZAUuRLZkE8j5s17ydBQl2yRsWprJhRE2rGNkvPhZ6L0Z64QxS75lrGMM0pkUQjLXqw73+AddgTl9MfS6P+/J+a4Cn9aC0c08acmkaWRmtZ0QSJaFGcYACahdsQt9sPsURJ/LYIEAMAKBSChmBgIghgMpePWrNui5+40UBonDh0gGg0AWSkzx7HBQgg6ChcKMaZKGroQIsVNBwAEP04AKJvZvBklwP37seZ6AgAICjAQENwo1CzYEoADFaEpeUKzSYYdIcTlx7vir6ZYKbcuoXgAFwgg6bRc3vuphSjrgNtmgjGypa1Fqv6Lr/FotEIWPjmSoUsnrs2G2e/g1HPUQ1VqJh5s1IwRoM9oyxIYR9cCntFLSDosAYrWGJgEBPy/YgLwfEWgLZQO0+zMECFVROwOR8pHWyuUpCFAjp+1HwTHsGyTy78/zvQ7pcfLDgfQH5VYcCiIbsJIOV2kEPtOzAYEgNQCICYmgWAAjQghQZ/XqcJJEmgobAst1GfIUEh+/zR6EP2O7gX3eNC5znbmc5ICGyCECPxAOnyPJAEXgLxAjGakffUK5jLOVmP7hc906l7/oQEPaZGtrry6tN2enQz6LnkjTfM8PS0HD4z45mKRPxx5z4Y8UzNNITfyIg9b3oEU5o9ymyN+wNLLBzGQjZMzbw+5rVpM/zGKxz2asTTDIjxb8zNO//2x1+XvY2ecyOY5enrZeAuhqZ7TOVUr2We91wv+AyHXRkxdK+uxM1ucllrPHGtHt3saWiN7TX7Y3tE8c3I4dOg5ZoUgvFyZn0E9otfPCA+FTNCfQeH/n3Y37xy87fHd9XfU37y2W9XTE4Eumz7rarzz3m0tnU/6b9m4zfdWbsbxtOfeHF4vOyse4YCxdS8s/4/y8GPX/9I3U03+S/u4teqByfa2wft12ouvuiVmgFbPGRg4pXqC0/Z1JPh83rn9GRu3tSfuarA6+vPoJThv/upcuVI+marIn/uOQ/8usvyUbDfe2tb8qaFI5oncUuj2rrRjtmec3pB5dIVQ3PD8VsOudi3ud6YufbxTes+TY//vsHwLxp3NmXWVixsW3dtfqgvnNlY/PHHJN8tZ225seTHw37kv+YJ+edEd9tXH2/5ykXuOes4/+q53vJN1tZFt+y78Ju5/5evblxy7LyAfV5B24aCwKJtuwenqv188czZ/59N8youLibxO+v/s1BedMBBXM4/OkAlpFx9iwCqulo9fNRfnfFLfnNp2pcA72w4KRbg/bVrGqK+/392jmsHAA4UAALfyeK8bob495QhCME+8fI+LXUF9fmYOTXK/OowD6vMn8xp1ZRlE94WIiVnYUgdaF14cfUXlIuniZM1BgS5WEMAN3ZZobuBx7hFp4UcZ9CKOI6hNXz8/fo8bZBlEeUgR56YGMSQZBVT+l6w1n5CbAGrBI3q1ajPkAGDQnbb37g+ZQjY8FjbXkOCxll8yvlUqhTlF9tmu23Wtr8OuKt2wKRRATakyAqsFrTHMdvn01v7lFZZyOI3SKkjj93BFjSsTw+sdKVJIYOC53ZYCum2kD2tyy5SocKAISGjArqV6xE0pkK3oHHDgibZyozpub36VOh3HLYh17z3ntpQCe55s34BPfoU0QAgOmyzIPkeiR49/UQ=) format("woff2");
+  }
   :root {
     --bg: #faf8f4; --fg: #1d1b17; --muted: #6a655b; --line: #e3ddd0;
     --yes: #146c36; --no: #a84a07; --none: #475569;
@@ -33,19 +39,23 @@
   }
   :focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
 
-  .gear {
-    position: fixed; top: 8px; right: 8px; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%;
+  .tools { position: fixed; top: 8px; right: 8px; display: flex; gap: 2px; }
+  .tool {
+    width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%;
     display: grid; place-items: center; background: transparent; color: var(--muted); cursor: pointer;
   }
-  .gear:hover { background: var(--none-bg); color: var(--fg); }
-  .gear svg { width: 24px; height: 24px; fill: currentColor; }
+  .tool:hover { background: var(--none-bg); color: var(--fg); }
+  .tool svg { width: 24px; height: 24px; fill: currentColor; }
 
-  .q { margin: 0; color: var(--muted); font-size: 1.05rem; }
+  .title {
+    margin: 0; font-family: "Syne Title", system-ui, -apple-system, "Segoe UI", sans-serif; font-weight: 800;
+    font-size: min(3.2rem, 8.6vw); line-height: 1.1; letter-spacing: -.01em;
+  }
   .answer {
-    margin: .1em 0 .15em; font-weight: 800; line-height: 1; letter-spacing: -.045em;
+    margin: -.16em 0 .1em; font-weight: 800; line-height: 1; letter-spacing: -.045em;   /* "no" and "yes" have no ascenders, so pull them up */
     font-size: clamp(5rem, 28vw, 10rem);
   }
-  .answer.none { font-size: clamp(3.2rem, 16vw, 6.5rem); letter-spacing: -.035em; }
+  .answer.none { margin-top: -.02em; font-size: clamp(3.2rem, 16vw, 6.5rem); letter-spacing: -.035em; }
   .answer.in { color: var(--no); }
   .answer.out { color: var(--yes); }
   .answer.none { color: var(--none); }
@@ -55,23 +65,29 @@
   .pill.out { background: var(--yes-bg); color: var(--yes); }
   .pill.none { background: var(--none-bg); color: var(--none); }
   .detail { margin: .2rem 0 0; color: var(--muted); }
-  .mode { margin: .2rem 0 0; color: var(--muted); font-size: .9rem; }
-  h2.small { margin: 2.2rem 0 .4rem; font-size: .8rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
-  ul { list-style: none; margin: 0; padding: 0; }
-  li { padding: .6rem 0; border-top: 1px solid var(--line); }
-  li b { display: block; font-weight: 600; }
-  li span { color: var(--muted); font-size: .95rem; }
-  footer { margin-top: 2rem; color: var(--muted); font-size: .85rem; }
+  footer { margin-top: 2.5rem; color: var(--muted); font-size: .85rem; }
   footer p { margin: .3rem 0; }
   .sim { display: inline-block; margin: 0 0 1rem; padding: .2rem .6rem; border-radius: 6px; background: var(--no-bg); color: var(--no); font-size: .85rem; font-weight: 600; }
   .sim[hidden] { display: none; }
 
+  /* the two panels fade in and out */
   dialog {
-    width: min(92vw, 24rem); padding: 20px; border: 1px solid var(--line); border-radius: 16px;
-    background: var(--bg); color: var(--fg); box-shadow: 0 12px 40px rgba(0, 0, 0, .25);
+    width: min(92vw, 24rem); max-height: min(88vh, 44rem); max-height: min(88dvh, 44rem); padding: 0; overflow: auto;
+    border: 1px solid var(--line); border-radius: 16px; background: var(--bg); color: var(--fg);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, .25);
+    opacity: 0; transition: opacity .24s ease;
   }
-  dialog::backdrop { background: rgba(0, 0, 0, .45); }
-  dialog h2 { margin: 0 0 1rem; font-size: 1.25rem; }
+  dialog.show { opacity: 1; }
+  dialog::backdrop { background: rgba(0, 0, 0, 0); transition: background-color .24s ease; }
+  dialog.show::backdrop { background: rgba(0, 0, 0, .45); }
+  @media (prefers-reduced-motion: reduce) { dialog, dialog::backdrop { transition: none; } }
+  dialog.wide { width: min(94vw, 36rem); }
+  .pad { padding: 20px; }
+  dialog h2 { margin: 0; font-size: 1.25rem; line-height: 1.25; }
+  .head { position: sticky; top: 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; padding: 18px 20px 10px; background: var(--bg); }
+  .x { flex: none; width: 36px; height: 36px; margin: -4px -8px 0 0; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--muted); font-size: 1.7rem; line-height: 1; cursor: pointer; }
+  .x:hover { background: var(--none-bg); color: var(--fg); }
+
   .field { display: block; margin: 0 0 1rem; padding: 0; border: 0; }
   .field > span, .field legend { display: block; margin: 0 0 .3rem; padding: 0; font-size: .8rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
   select {
@@ -81,7 +97,6 @@
   .choice { display: flex; gap: .6rem; align-items: flex-start; padding: .35rem 0; cursor: pointer; }
   .choice input { margin: .3rem 0 0; width: 1.1rem; height: 1.1rem; accent-color: var(--accent); }
   .choice small { display: block; color: var(--muted); font-size: .85rem; }
-  .spaced { margin-bottom: 1rem; }
   .note { margin: 0 0 1rem; color: var(--muted); font-size: .85rem; }
   .actions { display: flex; justify-content: space-between; gap: .6rem; }
   .actions button {
@@ -89,34 +104,45 @@
     border: 1px solid var(--muted); background: transparent; color: var(--fg);
   }
   .actions .primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+
+  .info { padding: 0 20px 22px; font-size: .95rem; }
+  .info p { margin: .4rem 0; }
+  .info h3 { margin: 1.3rem 0 .3rem; font-size: .78rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); }
+  .info ul { margin: .4rem 0; padding-left: 1.2rem; }
+  .info li { margin: .25rem 0; }
+  .info a { color: inherit; }
+  .info table { width: 100%; margin: .4rem 0; border-collapse: collapse; }
+  .info td { padding: .4rem 0; border-top: 1px solid var(--line); vertical-align: top; }
+  .info td:first-child { padding-right: .8rem; color: var(--muted); }
+  .info .names { font-weight: 600; }
 </style>
 </head>
 <body>
-<button class="gear" id="gear" type="button" aria-label="Settings" title="Settings">
-  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.48.48 0 0 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
-</button>
+<div class="tools">
+  <button class="tool" id="helpBtn" type="button" aria-label="How the times are worked out" title="How the times are worked out">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg>
+  </button>
+  <button class="tool" id="gear" type="button" aria-label="Settings" title="Settings">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.48.48 0 0 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+  </button>
+</div>
 
 <main>
   <p class="sim" id="sim" hidden></p>
-  <p class="q" id="q">Has Shabbat ended in Tel Aviv?</p>
+  <h1 class="title">Is it over?</h1>
   <p class="answer none" id="answer" role="status" aria-live="polite">…</p>
   <p class="status"><span class="pill none" id="pill"></span><span id="what"></span></p>
   <p class="detail" id="detail"></p>
-  <p class="mode" id="mode"></p>
-
-  <h2 class="small" id="listTitle">Coming up</h2>
-  <ul id="list"></ul>
 
   <footer>
     <p id="clock"></p>
-    <p id="rules"></p>
     <noscript><p>This page needs JavaScript to work out the times.</p></noscript>
   </footer>
 </main>
 
 <dialog id="settings" aria-labelledby="settingsTitle">
-  <form method="dialog">
-    <h2 id="settingsTitle">Settings</h2>
+  <div class="pad">
+    <h2 id="settingsTitle" style="margin-bottom:1rem">Settings</h2>
 
     <label class="field"><span>Place</span><select id="place"></select></label>
 
@@ -126,14 +152,20 @@
       <label class="choice"><input type="radio" name="israel" value="0"><span>Diaspora<small>two days of Yom Tov</small></span></label>
     </fieldset>
 
-    <label class="choice spaced"><input type="checkbox" id="rt"><span>Rabbeinu Tam<small>Shabbat and holidays end 72 minutes after sunset, later than usual</small></span></label>
-
     <p class="note">Saved in a cookie on this device.</p>
     <div class="actions">
       <button type="button" id="reset">Reset</button>
-      <button class="primary" value="close">Done</button>
+      <button type="button" class="primary" data-close>Done</button>
     </div>
-  </form>
+  </div>
+</dialog>
+
+<dialog id="help" class="wide" aria-labelledby="helpTitle">
+  <div class="head">
+    <h2 id="helpTitle">How the times are worked out</h2>
+    <button type="button" class="x" data-close aria-label="Close">×</button>
+  </div>
+  <div class="info" id="helpBody"></div>
 </dialog>
 
 <script src="shabbat.js"></script>
@@ -142,10 +174,11 @@
   'use strict';
   const $ = id => document.getElementById(id);
   const set = (id, text) => { const el = $(id); if (el.textContent !== text) el.textContent = text; };
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
   // ---- settings, kept in a cookie ------------------------------------------------------------------
-  const DEFAULTS = { place: 'tel-aviv', israel: true, rt: false };
-  const COOKIE = 'shabos';
+  const DEFAULTS = { place: 'tel-aviv', israel: true };
+  const COOKIE = 'isitover';
   const cookiePath = location.pathname.replace(/[^/]*$/, '') || '/';
 
   function loadSettings() {
@@ -156,14 +189,13 @@
         const q = new URLSearchParams(raw.slice(COOKIE.length + 1));
         if (Shabbat.PLACES[q.get('place')]) s.place = q.get('place');
         if (q.has('israel')) s.israel = q.get('israel') === '1';
-        if (q.has('rt')) s.rt = q.get('rt') === '1';
       }
     } catch (e) { /* no cookies: the defaults */ }
     return s;
   }
   function saveSettings() {
     try {
-      const value = new URLSearchParams({ place: settings.place, israel: settings.israel ? 1 : 0, rt: settings.rt ? 1 : 0 });
+      const value = new URLSearchParams({ place: settings.place, israel: settings.israel ? 1 : 0 });
       document.cookie = COOKIE + '=' + value + '; max-age=31536000; path=' + cookiePath + '; SameSite=Lax' +
         (location.protocol === 'https:' ? '; Secure' : '');
     } catch (e) { /* the page still works, it just forgets */ }
@@ -173,14 +205,14 @@
   }
 
   // ---- the engine for the current settings ---------------------------------------------------------
-  let settings = loadSettings(), S, tfmt, dfmt, listKey = '';
+  let settings = loadSettings(), S, tfmt, dfmt, sfmt;
+  const dayFmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'UTC', weekday: 'short', day: 'numeric', month: 'short' });
   function useSettings() {
-    const place = Object.assign({}, Shabbat.PLACES[settings.place], { israel: settings.israel });
-    if (settings.rt) place.havdalahMinutes = 72;           // Rabbeinu Tam
-    S = Shabbat.create(place);
-    tfmt = new Intl.DateTimeFormat('en-GB', { timeZone: S.place.tz, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
-    dfmt = new Intl.DateTimeFormat('en-GB', { timeZone: S.place.tz, weekday: 'short', day: 'numeric', month: 'short' });
-    listKey = '';
+    S = Shabbat.create(Object.assign({}, Shabbat.PLACES[settings.place], { israel: settings.israel }));
+    const tz = S.place.tz;
+    tfmt = new Intl.DateTimeFormat('en-GB', { timeZone: tz, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+    sfmt = new Intl.DateTimeFormat('en-GB', { timeZone: tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' });
+    dfmt = new Intl.DateTimeFormat('en-GB', { timeZone: tz, weekday: 'short', day: 'numeric', month: 'short' });
   }
   const time = ms => tfmt.format(ms);
   const date = ms => dfmt.format(ms);
@@ -203,24 +235,12 @@
     return Math.floor(h / 24) + ' days';
   };
   const name = p => p.names.join(' + ');
-  const hm = s => +s.slice(0, 2) * 60 + +s.slice(3);
-
-  function rules(P) {
-    const end = P.havdalahMinutes != null
-      ? 'Rabbeinu Tam: it ends ' + P.havdalahMinutes + ' minutes after sunset'
-      : 'It ends when the sun is ' + P.havdalahDegrees + '° below the horizon';
-    return 'Candle lighting is ' + P.candleMinutes + ' minutes before sunset, rounded earlier. ' + end +
-      ', rounded up to the next minute. Rounded the stringent way, matching the Tel Aviv table of yeshiva.org.il; ' +
-      'hebcal.com can show the end a minute earlier. Holidays: ' +
-      (P.israel ? 'one day, as in Israel.' : 'two days, as in the Diaspora.');
-  }
 
   function render() {
     const now = Date.now() + skew;
     const st = S.status(now), p = st.period, today = st.today, where = S.place.name;
 
     const answer = st.state === 'in' ? 'no' : st.state === 'out' ? 'yes' : 'not shabat';
-    set('q', st.state === 'none' ? 'Has Shabbat ended in ' + where + '?' : 'Has ' + name(p) + ' ended in ' + where + '?');
     set('answer', answer);
     $('answer').className = 'answer ' + st.state;
     $('pill').className = 'pill ' + st.state;
@@ -233,33 +253,110 @@
     } else {
       set('detail', 'Starts ' + when(p.start, today) + ' (in ' + span(st.untilStart) + ') · ends ' + when(p.end, today));
     }
-    set('mode', settings.rt ? 'Rabbeinu Tam: ends ' + S.place.havdalahMinutes + ' minutes after sunset' : '');
-    document.title = answer + ' · Shabbat in ' + where;
 
-    set('listTitle', st.state === 'none' ? 'After that' : 'Coming up');
-    const key = st.upcoming.map(u => u.start).join();
-    if (key !== listKey) {
-      listKey = key;
-      $('list').replaceChildren(...st.upcoming.map(u => {
-        const li = document.createElement('li'), b = document.createElement('b'), s = document.createElement('span');
-        b.textContent = name(u);
-        s.textContent = date(u.start) + ' ' + time(u.start) + '  →  ' + date(u.end) + ' ' + time(u.end);
-        li.append(b, s);
-        return li;
-      }));
-    }
-
-    let clock = 'Times are ' + where + ' time, which is ' + time(now) + ' there now.';
-    const off = ((hm(time(now)) - (new Date(now).getHours() * 60 + new Date(now).getMinutes()) + 1440 + 720) % 1440) - 720;
-    if (off) clock += ' Your clock is ' + (off % 60 ? Math.abs(off) + ' min' : Math.abs(off) / 60 + ' h') + (off > 0 ? ' behind.' : ' ahead.');
-    set('clock', clock);
-    set('rules', rules(S.place));
+    set('clock', 'It’s ' + time(now) + ' in ' + where + '.');
     $('sim').hidden = !simulated;
     set('sim', 'Simulated time: ' + date(now) + ' ' + time(now));
   }
 
-  // ---- the settings dialog -------------------------------------------------------------------------
-  const dialog = $('settings');
+  // ---- the "?" panel: how the times are worked out -------------------------------------------------
+  function renderInfo() {
+    const now = Date.now() + skew, st = S.status(now), p = st.period, P = S.place;
+    const eve = p.first - 1, last = p.last;
+    const sunsetMs = S.sunset(eve), sunsetMinute = Math.floor(sunsetMs / 60000) * 60000;
+    const lift = Math.round((sunsetMs - Shabbat.create(Object.assign({}, P, { elevation: 0 })).sunset(eve)) / 1000);
+    const where = esc(P.name);
+    const lat = Math.abs(P.lat).toFixed(3) + '° ' + (P.lat >= 0 ? 'N' : 'S'), lon = Math.abs(P.lon).toFixed(3) + '° ' + (P.lon >= 0 ? 'E' : 'W');
+    const heightShort = P.elevation > 0 ? P.elevation + ' m above sea level' : 'sea level';
+    const heightNote = P.elevation > 0
+      ? ' (about ' + (lift < 120 ? lift + ' seconds' : (lift / 60).toFixed(1) + ' minutes') + ' later than at sea level)'
+      : '';
+    const nightfall = P.havdalahMinutes != null
+      ? 'It ends ' + P.havdalahMinutes + ' minutes after sunset'
+      : 'It ends when the sun is ' + P.havdalahDegrees + '° below the horizon (when three small stars can be seen)';
+    const nightMs = S.nightfall(last);
+    const days = P.israel
+      ? 'both days of Rosh Hashana, Yom Kippur, the first day of Sukkot, Shmini Atzeret (which is also Simchat Torah), the first and seventh days of Pesach, and Shavuot'
+      : 'both days of Rosh Hashana, Yom Kippur, the first two days of Sukkot, Shmini Atzeret and Simchat Torah, the first two and last two days of Pesach, and the two days of Shavuot';
+
+    $('helpBody').innerHTML =
+      '<p>The page does the sums itself, on your device: the sun\'s position and the Hebrew calendar. Nothing is sent anywhere, and it never goes out of date.</p>' +
+
+      '<h3>Your settings</h3>' +
+      '<p><b>' + where + '</b>, ' + lat + ', ' + lon + ', ' + heightShort + '.</p>' +
+      '<p>' + (P.israel ? 'Holidays as in Israel: one day of Yom Tov.' : 'Holidays as in the Diaspora: two days of Yom Tov.') +
+      ' Times are always in ' + where + ' time (' + esc(P.tz) + '), whatever your own clock says.</p>' +
+
+      '<h3>The answer</h3>' +
+      '<ul><li><b>no</b>: Shabbat or a holiday is on, from candle lighting until it ends.</li>' +
+      '<li><b>yes</b>: it ended earlier today, after nightfall.</li>' +
+      '<li><b>not shabat</b>: neither is on.</li></ul>' +
+
+      '<h3>When it begins</h3>' +
+      '<p>Shabbat and holidays begin at candle lighting. Sunset is when the sun\'s upper edge meets the horizon, seen from ' +
+      heightShort + heightNote + '. Candle lighting is that minute (seconds dropped) minus ' + P.candleMinutes +
+      ' minutes, and one more minute to be safe: ' + (P.candleMinutes + 1) + ' minutes in all.</p>' +
+
+      '<h3>When it ends</h3>' +
+      '<p>' + esc(nightfall) + ', rounded up to the next whole minute.</p>' +
+
+      '<h3>Which days</h3>' +
+      '<p>Every Shabbat, and the holidays on which work is forbidden: ' + days + '.</p>' +
+      '<p>Days that touch, such as a holiday followed by Shabbat, are one period: it begins at the first candle lighting and ends at the last nightfall.</p>' +
+
+      '<h3>The numbers for the one on the page</h3>' +
+      '<p class="names">' + esc(name(p)) + '</p>' +
+      '<table>' +
+      '<tr><td>Sunset, ' + dayFmt.format(eve * 86400000) + '</td><td>' + sfmt.format(sunsetMs) + '</td></tr>' +
+      '<tr><td>Candle lighting</td><td>' + time(p.start) + ' (' + time(sunsetMinute) + ' minus ' + (P.candleMinutes + 1) + ' min)</td></tr>' +
+      '<tr><td>Nightfall, ' + dayFmt.format(last * 86400000) + '</td><td>' + sfmt.format(nightMs) + '</td></tr>' +
+      '<tr><td>Ends</td><td>' + time(p.end) + ' (rounded up)</td></tr>' +
+      '</table>' +
+
+      '<h3>Why another site can differ by a minute</h3>' +
+      '<p>There is no single official time, because sites round differently. This page rounds the stringent way, an earlier start and a later end, as yeshiva.org.il does for Tel Aviv. hebcal.com cuts the sunset to the minute and rounds nightfall to the nearest minute, so its end can be a minute earlier. These are calculated times, not a ruling: follow your own community\'s custom.</p>' +
+
+      '<h3>How it was checked</h3>' +
+      '<ul><li>yeshiva.org.il, Tel Aviv, Hebrew year 5787: the same end of Shabbat on 59 of 59 days and the same candle lighting on 58 of 59; the rest a minute off.</li>' +
+      '<li>The hebcal library: the same sun and the same Shabbat and holiday periods for Tel Aviv on every day from 2024 to 2099, and for 11 other places in Israel and abroad from 2024 to 2040. hebcal.com\'s own site agrees too.</li>' +
+      '<li>The US Naval Observatory: sunset within 29 seconds.</li>' +
+      '<li>Only Tel Aviv was compared with yeshiva.org.il; the other places use the same rules.</li></ul>' +
+      '<p>Source code and tests: <a href="https://github.com/erezu1/isitover">github.com/erezu1/isitover</a></p>';
+  }
+
+  // ---- the panels, with a fade ---------------------------------------------------------------------
+  const settingsDlg = $('settings'), helpDlg = $('help');
+  const reduceMotion = () => window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function openPanel(dlg, prepare) {
+    if (dlg.open) return;
+    prepare();
+    if (typeof dlg.showModal === 'function') dlg.showModal(); else dlg.setAttribute('open', '');
+    void dlg.offsetWidth;                          // settle the faded-out look first, so the fade-in runs
+    dlg.classList.add('show');
+    dlg.scrollTop = 0;
+  }
+  function closePanel(dlg) {
+    if (!dlg.open || !dlg.classList.contains('show')) return;
+    dlg.classList.remove('show');
+    const finish = () => { if (dlg.open) dlg.close(); };
+    if (reduceMotion()) { finish(); return; }
+    let timer;
+    const onEnd = e => { if (e.target === dlg && e.propertyName === 'opacity') end(); };
+    const end = () => { clearTimeout(timer); dlg.removeEventListener('transitionend', onEnd); finish(); };
+    dlg.addEventListener('transitionend', onEnd);
+    timer = setTimeout(end, 400);
+  }
+  for (const dlg of [settingsDlg, helpDlg]) {
+    dlg.addEventListener('cancel', e => { e.preventDefault(); closePanel(dlg); });          // Escape
+    dlg.addEventListener('click', e => {                                                      // the backdrop
+      const r = dlg.getBoundingClientRect();
+      if (e.target === dlg && (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom)) closePanel(dlg);
+    });
+    for (const b of dlg.querySelectorAll('[data-close]')) b.addEventListener('click', () => closePanel(dlg));
+  }
+
+  // ---- the settings --------------------------------------------------------------------------------
   $('place').replaceChildren(...Object.keys(Shabbat.PLACES).map(key => {
     const o = document.createElement('option');
     o.value = key; o.textContent = Shabbat.PLACES[key].name;
@@ -268,17 +365,14 @@
   function showSettings() {
     $('place').value = settings.place;
     for (const r of document.querySelectorAll('input[name=israel]')) r.checked = (r.value === '1') === settings.israel;
-    $('rt').checked = settings.rt;
   }
   function changed() {
     useSettings();
     saveSettings();
     render();
   }
-  $('gear').addEventListener('click', () => {
-    showSettings();
-    if (typeof dialog.showModal === 'function') dialog.showModal(); else dialog.setAttribute('open', '');
-  });
+  $('gear').addEventListener('click', () => openPanel(settingsDlg, showSettings));
+  $('helpBtn').addEventListener('click', () => openPanel(helpDlg, renderInfo));
   $('place').addEventListener('change', e => {
     settings.place = e.target.value;
     settings.israel = !!Shabbat.PLACES[settings.place].israel;   // each place starts with its own holiday schedule
@@ -286,17 +380,12 @@
     changed();
   });
   for (const r of document.querySelectorAll('input[name=israel]')) r.addEventListener('change', e => { settings.israel = e.target.value === '1'; changed(); });
-  $('rt').addEventListener('change', e => { settings.rt = e.target.checked; changed(); });
   $('reset').addEventListener('click', () => {
     settings = Object.assign({}, DEFAULTS);
     forgetSettings();
     showSettings();
     useSettings();
     render();
-  });
-  dialog.addEventListener('click', e => {                        // a click on the backdrop closes it
-    const r = dialog.getBoundingClientRect();
-    if (e.target === dialog && (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom)) dialog.close();
   });
 
   try {

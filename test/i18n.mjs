@@ -132,7 +132,7 @@ const tags = s => [...new Set([...String(s).matchAll(/<\/?(\w+)/g)].map(m => m[1
 }
 
 // 8. The display fonts are cut down to certain letters: the titles and answers must stay inside them.
-//    Syne (English): Latin letters. Rubik (Hebrew): Hebrew letters, geresh, gershayim, maqaf. Both: space ? ! . , : -
+//    Bricolage Grotesque (English): Latin letters. Rubik (Hebrew): Hebrew letters, geresh, gershayim, maqaf. Both: space ? ! . , : -
 {
   const allowed = {
     he: c => /[א-ת׳״־]/.test(c) || ' ?!.,:-'.includes(c),
@@ -191,6 +191,14 @@ const tags = s => [...new Set([...String(s).matchAll(/<\/?(\w+)/g)].map(m => m[1
   const missing = [...used].filter(([ch]) => !covered(ch)).map(([ch, where]) => `${JSON.stringify(ch)} U+${ch.codePointAt(0).toString(16).toUpperCase().padStart(4, '0')} (${where})`);
   report(faces.length === 4 && used.size > 80 && !missing.length, `the embedded text font covers all ${used.size} characters the page's text uses` +
     (missing.length ? `  (not covered: ${missing}; cut the font again with them, see the README)` : '') + (faces.length !== 4 ? `  (found ${faces.length} Plex Text faces, expected 4)` : ''));
+}
+
+// 12. English text uses Bricolage Grotesque, cut to exactly the same characters as the Latin face of the Plex text font.
+{
+  const ranges = name => [...html.matchAll(new RegExp('font-family: "' + name + '";[^}]*?unicode-range:\\s*([^;]+);', 'g'))].map(m => m[1].trim());
+  const plexLatin = ranges('Plex Text').filter(r => r.startsWith('U+0020')), bric = ranges('Bricolage Text');
+  report(bric.length === 2 && bric.every(r => r === plexLatin[0]) && /:root:lang\(en\)\s*\{\s*--text: "Bricolage Text"/.test(html),
+    'English small text is Bricolage Grotesque (Regular and SemiBold), covering the same characters as the Latin text face');
 }
 
 console.log(failed ? `\n${failed} check(s) failed` : '\nall checks passed');

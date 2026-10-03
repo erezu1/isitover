@@ -110,6 +110,9 @@ const bgs = [...html.matchAll(/--bg:\s*(#[0-9a-f]{6})/gi)].map(m => m[1].toLower
     `the theme colours follow the page's light (${bgs[0]}) and dark (${bgs[1]}) background`);
   report(/apple-mobile-web-app-capable/.test(html) && /mobile-web-app-capable/.test(html) && /apple-mobile-web-app-title/.test(html), 'the home-screen meta tags (capable, title) are there');
   report(/serviceWorker\.register\('sw\.js'\)/.test(html) && existsSync(new URL('sw.js', root)), 'index.html registers sw.js, and it exists');
+  report(/<button[^>]*id="installBtn"[^>]*\shidden[\s>]/.test(html) && /<aside[^>]*id="install"[^>]*\shidden[\s>]/.test(html) &&
+    /beforeinstallprompt/.test(html) && /appinstalled/.test(html),
+    'the install button and the invitation start hidden, and the script listens for beforeinstallprompt and appinstalled');
   const local = [...html.matchAll(/<(?:link|script|img)\s[^>]*?(?:href|src)="([^"#]+)"/g)].map(m => m[1]).filter(u => !/^(?:[a-z][a-z0-9+.-]*:|\/\/)/i.test(u));
   const gone = local.filter(u => !existsSync(new URL(u.split('?')[0], root)));
   report(local.length >= 6 && !gone.length, `the ${local.length} local files index.html points to all exist` + (gone.length ? `  (missing: ${gone})` : ''));

@@ -46,6 +46,7 @@
   const EN = {
     'tool.help': 'How the times are worked out',
     'tool.settings': 'Settings',
+    'tool.install': 'Install as an app',
     'common.close': 'Close',
 
     'settings.title': 'Settings',
@@ -58,6 +59,13 @@
     'settings.diaspora.note': 'two days of Yom Tov',
     'settings.reset': 'Reset',
     'settings.done': 'Done',
+
+    'install.title': 'Add it to your home screen',
+    'install.text': 'It opens like an app and works without a network.',
+    'install.ios': 'Tap {share}, then <b>Add to Home Screen</b>.',
+    'install.yes': 'Install',
+    'install.later': 'Not now',
+    'install.ok': 'Got it',
 
     'title.shabbat': 'Is it over?',
     'title.chag': 'Is it over?',
@@ -147,6 +155,7 @@
   const HE = {
     'tool.help': 'איך הזמנים מחושבים',
     'tool.settings': 'הגדרות',
+    'tool.install': 'התקנה כאפליקציה',
     'common.close': 'סגירה',
 
     'settings.title': 'הגדרות',
@@ -159,6 +168,13 @@
     'settings.diaspora.note': 'שני ימים טובים',
     'settings.reset': 'איפוס',
     'settings.done': 'סיום',
+
+    'install.title': 'להוסיף למסך הבית?',
+    'install.text': 'נפתח כמו אפליקציה, ועובד גם בלי רשת.',
+    'install.ios': 'לוחצים על {share} ואז על <b>הוספה למסך הבית</b>.',
+    'install.yes': 'התקנה',
+    'install.later': 'לא עכשיו',
+    'install.ok': 'הבנתי',
 
     'title.shabbat': 'האם יצאה שבת?',
     'title.chag': 'האם יצא החג?',

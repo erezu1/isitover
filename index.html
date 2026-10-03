@@ -472,7 +472,9 @@
     s += p.line('il-faint', ox, hor, sx - r * Math.cos(a), sy - r * Math.sin(a), ' stroke-dasharray="3 4"');
     s += p.dot('il-sun', sx, sy.toFixed(1), r);
     const ar = 84, ex = ox + ar * Math.cos(a), ey = hor + ar * Math.sin(a);
-    s += '<path class="il-ink" stroke-width="1.5" d="M' + p.X(ox + ar) + ' ' + hor + 'A' + ar + ' ' + ar + ' 0 0 ' + (o.rtl ? 0 : 1) + ' ' + p.X(ex).toFixed(1) + ' ' + ey.toFixed(1) + '"/>';
+    const arc = 'A' + ar + ' ' + ar + ' 0 0 ' + (o.rtl ? 0 : 1) + ' ' + p.X(ex).toFixed(1) + ' ' + ey.toFixed(1);
+    s = '<path class="il-band" d="M' + p.X(ox) + ' ' + hor + 'L' + p.X(ox + ar) + ' ' + hor + arc + 'Z"/>' + s;   // the angle, filled softly
+    s += '<path class="il-ink" stroke-width="1.5" d="M' + p.X(ox + ar) + ' ' + hor + arc + '"/>';
     const lx = ox + ar + 8, ly = hor + ar * Math.sin(a / 2) + 6;
     s += p.text('il-n', lx, ly.toFixed(1), o.degLabel);
     s += p.dot('il-dot', ox, hor - 3, 3);

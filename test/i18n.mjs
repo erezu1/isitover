@@ -79,6 +79,7 @@ const tags = s => [...new Set([...String(s).matchAll(/<\/?(\w+)/g)].map(m => m[1
     [L.t('tag.in.chag'), 'בתוקף'], [L.t('tag.out.chag'), 'יצא'], [L.t('tag.none.chag'), 'יצא'],
     [En.t('title.shabbat'), 'Is it over?'], [En.t('title.chag'), 'Is it over?'],
     [En.t('answer.in'), 'no'], [En.t('answer.out'), 'yes'], [En.t('answer.none'), 'not shabat'],
+    [L.t('clock', { time: '19:35', place: 'תל אביב' }), 'עכשיו 19:35 בתל אביב.'], [En.t('clock', { time: '19:35', place: 'Tel Aviv' }), 'It’s 19:35 in Tel Aviv.'],
   ];
   const bad = want.filter(([got, w]) => got !== w);
   report(!bad.length, 'titles, answers and tags are the exact words asked for' + (bad.length ? '  ' + bad.map(([g, w]) => `${g} != ${w}`).join(' | ') : ''));

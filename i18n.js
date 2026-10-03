@@ -171,7 +171,7 @@
     'detail.in': p => HE_VERBS[p.kind].entered + ' ' + p.start + ' · ' + HE_VERBS[p.kind].willExit + ' ' + p.end + ' (בעוד ' + p.left + ')',
     'detail.out': p => HE_VERBS[p.kind].exited + ' ' + p.end + ' (לפני ' + p.ago + ')',
     'detail.none': p => HE_VERBS[p.kind].willEnter + ' ' + p.start + ' (בעוד ' + p.left + ') · ' + HE_VERBS[p.kind].willExit + ' ' + p.end,
-    'clock': 'השעה {time} ב{place}.',
+    'clock': 'עכשיו {time} ב{place}.',
     'sim': 'זמן מדומה: {when}',
     'error': 'הדפדפן הזה לא מצליח לחשב את הזמנים ({message}).',
 

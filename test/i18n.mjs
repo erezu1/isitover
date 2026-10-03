@@ -189,7 +189,7 @@ const tags = s => [...new Set([...String(s).matchAll(/<\/?(\w+)/g)].map(m => m[1
   const page = html.slice(html.indexOf('<body>')).replace(/<script[\s\S]*?<\/script>/g, '').replace(/<style[\s\S]*?<\/style>/g, '').replace(/<[^>]*>/g, ' ');
   see('index.html', page);
   const missing = [...used].filter(([ch]) => !covered(ch)).map(([ch, where]) => `${JSON.stringify(ch)} U+${ch.codePointAt(0).toString(16).toUpperCase().padStart(4, '0')} (${where})`);
-  report(faces.length === 4 && used.size > 100 && !missing.length, `the embedded text font covers all ${used.size} characters the page's text uses` +
+  report(faces.length === 4 && used.size > 80 && !missing.length, `the embedded text font covers all ${used.size} characters the page's text uses` +
     (missing.length ? `  (not covered: ${missing}; cut the font again with them, see the README)` : '') + (faces.length !== 4 ? `  (found ${faces.length} Plex Text faces, expected 4)` : ''));
 }
 

@@ -74,6 +74,7 @@
     --yes-ink: #166534; --no-ink: #b91c1c;                                /* the same, darker, for the small tags */
     --yes-bg: #dcfce7; --no-bg: #fee2e2; --none-bg: #e8e6df; --accent: #1d1b17; --on-accent: #faf8f4;
     --warn: #a84a07; --warn-bg: #fbe8d2;                                  /* the "simulated time" banner */
+    --sun: #e0a030;                                                       /* the sun in the "?" panel's drawings */
     --chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236a655b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
     --display: "Syne Display", system-ui, -apple-system, "Segoe UI", sans-serif; --display-weight: 800;
     --text: "Plex Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -88,6 +89,7 @@
       --yes-ink: #4ade80; --no-ink: #f87171;
       --yes-bg: #14351f; --no-bg: #3f1618; --none-bg: #25231d; --accent: #f2eee5; --on-accent: #13120e;
       --warn: #ffb066; --warn-bg: #3a2612;
+      --sun: #f2b544;
       --chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a39d90' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
     }
   }
@@ -211,7 +213,22 @@
   .info table { width: 100%; margin: .4rem 0; border-collapse: collapse; }
   .info td { padding: .4rem 0; border-top: 1px solid var(--line); vertical-align: top; }
   .info td:first-child { padding-inline-end: .8rem; color: var(--muted); }
-  .info .names { font-weight: 600; }
+  .info .where { color: var(--muted); font-size: .85rem; }
+
+  /* the illustrations in the "?" panel: thin line drawings in the page's colours (see illBegins, illEnds, illPeriod) */
+  .ill { display: block; width: 100%; height: auto; margin: .6rem 0 .2rem; overflow: visible; }
+  .ill * { stroke-linecap: round; stroke-linejoin: round; }
+  .il-line { stroke: var(--muted); fill: none; stroke-width: 1.5; }
+  .il-faint { stroke: var(--line); fill: none; stroke-width: 1.5; }
+  .il-ink { stroke: var(--fg); fill: none; stroke-width: 2; }
+  .il-sun { fill: var(--sun); stroke: none; }
+  .il-sunline { stroke: var(--sun); fill: none; stroke-width: 2; }
+  .il-dot { fill: var(--fg); }
+  .il-mute { fill: var(--muted); }
+  .il-band { fill: var(--none-bg); }
+  .il-red { fill: var(--no-bg); stroke: var(--no-ink); stroke-width: 1.5; }
+  .il-t { fill: var(--muted); font-size: 11px; }
+  .il-n { fill: var(--fg); font-size: 12px; font-weight: 600; }
 
   /* Hebrew has no capitals and does not take letter spacing */
   :lang(he) .pill, :lang(he) .info h3, :lang(he) .field > span, :lang(he) .field legend { letter-spacing: 0; text-transform: none; }
@@ -296,7 +313,7 @@
 </dialog>
 
 <script src="shabbat.js?v=101401f9"></script>
-<script src="i18n.js?v=d6534829"></script>
+<script src="i18n.js?v=d8fd5b80"></script>
 <script>
 (function () {
   'use strict';
@@ -399,56 +416,162 @@
   }
 
   // ---- the "?" panel: how the times are worked out -------------------------------------------------
+  // ---- the drawings in the "?" panel -----------------------------------------------------------------
+  // Thin line drawings in the page's own colours (the il-* classes in the CSS), 320 units wide, made from the live numbers.
+  // In Hebrew the scene is mirrored (time runs right to left) but the words are not: X() mirrors positions.
+  function drawing(rtl, h, aria, body) {
+    return '<svg class="ill" viewBox="0 0 320 ' + h + '" role="img" aria-label="' + I18N.esc(aria) + '">' + body + '</svg>';
+  }
+  function pen(rtl) {
+    const X = x => rtl ? 320 - x : x;                 // with direction="rtl", text-anchor start/end already mirror
+    const text = (cls, x, y, s, anchor) => '<text class="' + cls + '" x="' + X(x).toFixed(1) + '" y="' + y + '" text-anchor="' + (anchor || 'start') + '"' +
+      (rtl ? ' direction="rtl"' : '') + '>' + I18N.esc(s) + '</text>';
+    const line = (cls, x1, y1, x2, y2, extra) => '<line class="' + cls + '" x1="' + X(x1).toFixed(1) + '" y1="' + y1 + '" x2="' + X(x2).toFixed(1) + '" y2="' + y2 + '"' + (extra || '') + '/>';
+    const dot = (cls, x, y, r) => '<circle class="' + cls + '" cx="' + X(x).toFixed(1) + '" cy="' + y + '" r="' + r + '"/>';
+    const star = (x, y, r) => {                         // a four-point sparkle
+      const c = X(x), k = r * 0.28;
+      return '<path class="il-dot" d="M' + c + ' ' + (y - r) + 'Q' + (c + k) + ' ' + (y - k) + ' ' + (c + r) + ' ' + y + 'Q' + (c + k) + ' ' + (y + k) + ' ' + c + ' ' + (y + r) +
+        'Q' + (c - k) + ' ' + (y + k) + ' ' + (c - r) + ' ' + y + 'Q' + (c - k) + ' ' + (y - k) + ' ' + c + ' ' + (y - r) + 'Z"/>';
+    };
+    const candle = (x, y) =>                            // a small candle: body with its foot at (x, y), and a flame
+      '<rect class="il-ink" x="' + (X(x) - 2.5).toFixed(1) + '" y="' + (y - 11) + '" width="5" height="11" rx="1"/>' +
+      '<path class="il-sun" d="M' + X(x) + ' ' + (y - 20) + 'q3.2 4.2 0 6.6q-3.2 -2.4 0 -6.6z"/>';
+    return { X, text, line, dot, star, candle };
+  }
+
+  // When it begins: the sun with its top edge on the horizon, seen from the place's height; candle lighting before it.
+  function illBegins(o) {
+    const p = pen(o.rtl), H = 130, hor = 56, eye = o.height ? 34 : hor - 3, sx = 252, r = 11;
+    let s = '';
+    s += p.line('il-line', 16, hor, 304, hor);
+    s += '<path class="il-sunline" d="M' + p.X(sx - 22) + ' ' + (hor - 3) + 'Q' + p.X(sx) + ' ' + (hor - 16) + ' ' + p.X(sx + 22) + ' ' + (hor - 3) + '" opacity=".55"/>';
+    s += p.dot('il-sun', sx, hor + r, r);               // the disc just under the line: its top edge touches the horizon
+    s += p.line('il-faint', 52, eye, sx, hor, ' stroke-dasharray="3 4"');
+    if (o.height) { s += p.line('il-ink', 52, hor, 52, eye + 4); s += p.text('il-t', 60, eye + 12, o.height); }
+    s += p.dot('il-dot', 52, eye, 3);
+    // the time axis: candle lighting, then sunset
+    const ax = 100, cx = 70;
+    s += p.line('il-faint', 30, ax, 290, ax);
+    s += p.line('il-line', cx, ax - 5, cx, ax + 5) + p.line('il-line', sx, ax - 5, sx, ax + 5);
+    s += p.candle(cx, ax - 9);
+    s += p.line('il-line', cx + 10, ax - 6, sx - 10, ax - 6, ' stroke-dasharray="1 4"');
+    s += p.text('il-t', (cx + sx) / 2, ax - 11, o.minLabel, 'middle');
+    s += p.text('il-n', cx, ax + 17, o.candle, 'middle') + p.text('il-t', cx, ax + 29, o.candleLabel, 'middle');
+    s += p.text('il-n', sx, ax + 17, o.sunset, 'middle') + p.text('il-t', sx, ax + 29, o.sunsetLabel, 'middle');
+    return drawing(o.rtl, H, o.aria, s);
+  }
+
+  // When it ends: the sun below the horizon at the set angle (drawn twice as steep, so it can be seen), and three stars.
+  function illEnds(o) {
+    const p = pen(o.rtl), H = 132, hor = 66, ox = 64, r = 9;
+    const a = Math.min(30, Math.max(10, o.deg * 2)) * Math.PI / 180, dist = 172;
+    const sx = ox + dist * Math.cos(a), sy = hor + dist * Math.sin(a);
+    let s = '';
+    s += p.star(206, 22, 6) + p.star(246, 40, 4) + p.star(276, 18, 4.8);
+    s += p.line('il-line', 16, hor, 304, hor);
+    s += p.line('il-faint', ox, hor, sx - r * Math.cos(a), sy - r * Math.sin(a), ' stroke-dasharray="3 4"');
+    s += p.dot('il-sun', sx, sy.toFixed(1), r);
+    const ar = 84, ex = ox + ar * Math.cos(a), ey = hor + ar * Math.sin(a);
+    s += '<path class="il-ink" stroke-width="1.5" d="M' + p.X(ox + ar) + ' ' + hor + 'A' + ar + ' ' + ar + ' 0 0 ' + (o.rtl ? 0 : 1) + ' ' + p.X(ex).toFixed(1) + ' ' + ey.toFixed(1) + '"/>';
+    const lx = ox + ar + 8, ly = hor + ar * Math.sin(a / 2) + 6;
+    s += p.text('il-n', lx, ly.toFixed(1), o.degLabel);
+    s += p.dot('il-dot', ox, hor - 3, 3);
+    s += p.text('il-t', sx + r + 6, (sy + 4).toFixed(1), o.nightfall);
+    s += p.text('il-t', 16, 22, o.endLabel) + p.text('il-n', 16, 38, o.end);
+    return drawing(o.rtl, H, o.aria, s);
+  }
+
+  // The one on the page: a bar from candle lighting to the end, its Shabbat and holiday runs, the days, and now.
+  function illPeriod(o) {
+    const p = pen(o.rtl), H = 104, x0 = 24, x1 = 296, y = 52, bh = 10, span = o.end - o.start;
+    const at = ms => x0 + (x1 - x0) * (ms - o.start) / span;
+    let s = '<defs><clipPath id="illPeriodBar"><rect x="' + x0 + '" y="' + (y - bh / 2) + '" width="' + (x1 - x0) + '" height="' + bh + '" rx="' + bh / 2 + '"/></clipPath></defs>';
+    s += '<g clip-path="url(#illPeriodBar)">';
+    o.segments.forEach((g, i) => {
+      const a = at(g.start), b = at(g.end), left = Math.min(p.X(a), p.X(b));
+      s += '<rect class="' + (i % 2 ? 'il-band' : 'il-red') + '" x="' + left.toFixed(1) + '" y="' + (y - bh / 2) + '" width="' + Math.abs(b - a).toFixed(1) + '" height="' + bh + '"/>';
+    });
+    s += '</g>';
+    o.segments.forEach((g, i) => { s += p.text('il-t', (at(g.start) + at(g.end)) / 2, y - 12 - (o.segments.length > 2 && i % 2 ? 12 : 0), g.name, 'middle'); });
+    o.days.forEach(d => { const x = at(d.at); s += p.line('il-faint', x, y - 9, x, y + 9) + p.text('il-t', x, y + 22, d.label, 'middle'); });
+    s += p.candle(x0 + 3, y - 10 - 18) ;
+    s += p.star(x1 - 3, y - 26, 4);
+    s += p.text('il-n', x0, y + 40, o.startText, 'start') + p.text('il-n', x1, y + 40, o.endText, 'end');
+    if (o.now >= o.start - 6 * 3600e3 && o.now <= o.end + 6 * 3600e3) {
+      const x = Math.min(x1 + 10, Math.max(x0 - 10, at(o.now)));
+      s += p.line('il-ink', x, y - 9, x, y + 9) + p.dot('il-dot', x, y, 3);
+      if (x > x0 + 30 && x < x1 - 30) s += p.text('il-t', x, y - 28, o.nowLabel, 'middle');
+    }
+    return drawing(o.rtl, H, o.aria, s);
+  }
+
+  // The local midnights inside a period, for the day ticks on its timeline.
+  function midnights(from, to, tz) {
+    const hm = new Intl.DateTimeFormat('en-GB', { timeZone: tz, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+    const out = [], STEP = 15 * 60000;
+    for (let ms = Math.ceil(from / STEP) * STEP; ms < to; ms += STEP) if (hm.format(ms) === '00:00') out.push(ms);
+    return out;
+  }
+
   function renderInfo() {
     const now = Date.now() + skew, st = S.status(now), p = st.period, P = S.place;
     const place = L.placeName(P), eve = p.first - 1, last = p.last;
-    const sunsetMs = S.sunset(eve), sunsetMinute = Math.floor(sunsetMs / 60000) * 60000;
+    const sunsetMs = S.sunset(eve), sunsetMinute = Math.floor(sunsetMs / 60000) * 60000, nightMs = S.nightfall(last);
     const lift = Math.round((sunsetMs - Shabbat.create(Object.assign({}, P, { elevation: 0 })).sunset(eve)) / 1000);
-    const up = P.elevation > 0;
+    const up = P.elevation > 0, rtl = L.dir === 'rtl', total = P.candleMinutes + 1, byMinutes = P.havdalahMinutes != null;
     const h = (key, params) => L.h(key, params);
     const row = (label, value) => '<tr><td>' + label + '</td><td>' + value + '</td></tr>';
-    const ends = P.havdalahMinutes != null ? h('help.ends.minutes', { n: P.havdalahMinutes }) : h('help.ends.degrees', { deg: P.havdalahDegrees });
+    const ends = byMinutes ? h('help.ends.minutes', { n: P.havdalahMinutes }) : h('help.ends.degrees', { deg: P.havdalahDegrees });
+    const weekday = new Intl.DateTimeFormat(L.locale, { weekday: 'short', timeZone: P.tz });
+    const at = ms => weekday.format(ms) + ' ' + f.time(ms);
+    const segments = (p.segments && p.segments.length ? p.segments : [p]).map(s => ({ name: s.items.map(L.itemName).join(' + '), start: s.start, end: s.end }));
 
     $('helpBody').innerHTML =
       '<p>' + h('help.intro') + '</p>' +
-
-      '<h3>' + h('help.settings.h') + '</h3>' +
-      '<p>' + h('help.place', { place, coords: f.coords(P.lat, P.lon), height: raw(up ? h('help.height.up', { m: P.elevation }) : h('help.height.sea')) }) + '</p>' +
-      '<p>' + h(P.israel ? 'help.holidays.israel' : 'help.holidays.diaspora', { place, tz: P.tz }) + '</p>' +
-
-      '<h3>' + h('help.answer.h') + '</h3>' +
-      '<ul><li>' + h('help.answer.in') + '</li><li>' + h('help.answer.out') + '</li><li>' + h('help.answer.none') + '</li></ul>' +
+      '<p class="where">' + h('help.place', {
+        place, coords: f.coords(P.lat, P.lon),
+        height: raw(up ? h('help.height.up', { m: P.elevation }) : h('help.height.sea')),
+        holidays: raw(h(P.israel ? 'help.holidays.israel' : 'help.holidays.diaspora'))
+      }) + '</p>' +
 
       '<h3>' + h('help.begins.h') + '</h3>' +
+      illBegins({
+        rtl, aria: L.t('ill.begins.aria', { n: total }), sunset: f.seconds(sunsetMs), candle: f.time(p.start), minutes: total,
+        minLabel: L.t('ill.min', { n: total }), height: up ? L.t('ill.height', { m: P.elevation }) : '',
+        sunsetLabel: L.t('ill.sunset'), candleLabel: L.t('ill.candle')
+      }) +
       '<p>' + h('help.begins', {
         from: raw(up ? h('help.begins.from.up', { m: P.elevation }) : h('help.begins.from.sea')),
         note: raw(up ? h('help.begins.note', { lift: f.lift(lift) }) : ''),
-        minutes: P.candleMinutes, total: P.candleMinutes + 1
+        minutes: P.candleMinutes, total
       }) + '</p>' +
 
       '<h3>' + h('help.ends.h') + '</h3>' +
+      (byMinutes ? '' : illEnds({
+        rtl, aria: L.t('ill.ends.aria', { deg: P.havdalahDegrees }), deg: P.havdalahDegrees, degLabel: P.havdalahDegrees + '°',
+        nightfall: f.seconds(nightMs), end: f.time(p.end), endLabel: L.t('ill.end')
+      })) +
       '<p>' + ends + '</p>' +
 
-      '<h3>' + h('help.days.h') + '</h3>' +
-      '<p>' + h('help.days', { days: raw(h(P.israel ? 'help.days.israel' : 'help.days.diaspora')) }) + '</p>' +
-      '<p>' + h('help.days.touch') + '</p>' +
-
       '<h3>' + h('help.numbers.h') + '</h3>' +
-      '<p class="names">' + I18N.esc(p.items.map(L.itemName).join(' + ')) + '</p>' +
+      illPeriod({
+        rtl, aria: L.t('ill.period.aria'), start: p.start, end: p.end, now, segments,
+        startText: at(p.start), endText: at(p.end), nowLabel: L.t('ill.now'),
+        days: midnights(p.start, p.end, P.tz).map(ms => ({ at: ms, label: weekday.format(ms) }))
+      }) +
       '<table>' +
       row(h('help.num.sunset', { day: f.dayLabel(eve) }), f.seconds(sunsetMs)) +
-      row(h('help.num.candle'), h('help.num.candle.v', { time: f.time(p.start), sunsetMinute: f.time(sunsetMinute), minutes: P.candleMinutes + 1 })) +
-      row(h('help.num.night', { day: f.dayLabel(last) }), f.seconds(S.nightfall(last))) +
+      row(h('help.num.candle'), h('help.num.candle.v', { time: f.time(p.start), sunsetMinute: f.time(sunsetMinute), minutes: total })) +
+      row(h('help.num.night', { day: f.dayLabel(last) }), f.seconds(nightMs)) +
       row(h('help.num.ends'), h('help.num.ends.v', { time: f.time(p.end) })) +
       '</table>' +
 
-      '<h3>' + h('help.differ.h') + '</h3>' +
-      '<p>' + h('help.differ') + '</p>' +
+      '<h3>' + h('help.days.h') + '</h3>' +
+      '<p>' + h('help.days', { days: raw(h(P.israel ? 'help.days.israel' : 'help.days.diaspora')) }) + '</p>' +
 
       '<h3>' + h('help.checked.h') + '</h3>' +
-      '<ul><li>' + h('help.checked.yeshiva') + '</li><li>' + h('help.checked.hebcal') + '</li>' +
-      '<li>' + h('help.checked.usno') + '</li><li>' + h('help.checked.only') + '</li></ul>' +
-      '<p>' + h('help.source') + '</p>';
+      '<p>' + h('help.checked') + '</p>' +
+      '<p class="where">' + h('help.source') + '</p>';
   }
 
   // ---- the panels, with a fade ---------------------------------------------------------------------

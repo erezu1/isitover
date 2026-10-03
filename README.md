@@ -14,7 +14,7 @@ Holidays are the days on which work is forbidden: Rosh Hashana, Yom Kippur, Sukk
 
 Switching language fades the words and buttons out, flips the language and direction while they are invisible, and fades them back in. Buttons at the top (the top right in English, the top left in Hebrew, since the whole layout mirrors), two of them opening a panel that fades in and out:
 
-- **?** explains how the times are worked out, with the numbers for the period on the page;
+- **?** explains how the times are worked out, briefly, with three line drawings made from the live numbers: the sunset and candle lighting (the observer's height, the minutes between), the sun the set number of degrees below the horizon with three stars, and a timeline of the period on the page (its Shabbat and holiday runs, the day boundaries, and where *now* is); then the exact times to the second;
 - **gear** has the settings, kept in a cookie on the device: **language** (Hebrew by default), **place** (Tel Aviv by default; Petah Tikva, Jerusalem, Haifa, Be'er Sheva, Amsterdam, London, New York) and **holidays** (Israel, or Diaspora with second days; in Hebrew **ארץ ישראל** or **גלויות**).
 
 **Install button.** Between the **?** and the gear: it installs the page as an app (Chrome shows its own prompt; Safari on iOS has none, so it shows the steps), and is hidden where the browser cannot install and once the app is installed.

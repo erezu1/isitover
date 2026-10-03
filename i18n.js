@@ -22,6 +22,7 @@
   const MIN = 60000, DAY = 86400000;
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const raw = html => ({ html: String(html) });       // a parameter that is already HTML
+  const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
 
   // ---- formatting both languages share ----------------------------------------------------------------
   const intl = (locale, tz, options) => new Intl.DateTimeFormat(locale, Object.assign({ timeZone: tz }, options));
@@ -76,7 +77,7 @@
     'tag.out.shabbat': 'OUT', 'tag.out.chag': 'OUT',
     'tag.none.shabbat': 'NEXT', 'tag.none.chag': 'NEXT',
     'detail.in': 'Began {start} · ends {end} (in {left})',
-    'detail.out': 'Ended {end} ({ago} ago)',
+    'detail.out': p => cap(p.end) + ' (' + p.ago + ' ago)',                     // the tag already says OUT
     'detail.none': 'Starts {start} (in {left}) · ends {end}',
     'clock': 'It’s {time} in {place}.',
     'sim': 'Simulated time: {when}',
@@ -185,8 +186,8 @@
     'tag.out.shabbat': HE_VERBS.shabbat.exited, 'tag.out.chag': HE_VERBS.chag.exited,
     'tag.none.shabbat': HE_VERBS.shabbat.willExit, 'tag.none.chag': HE_VERBS.chag.willExit,
     'detail.in': p => HE_VERBS[p.kind].entered + ' ' + p.start + ' · ' + HE_VERBS[p.kind].willExit + ' ' + p.end + ' (בעוד ' + p.left + ')',
-    'detail.out': p => HE_VERBS[p.kind].exited + ' ' + p.end + ' (לפני ' + p.ago + ')',
-    'detail.none': p => HE_VERBS[p.kind].willEnter + ' ' + p.start + ' (בעוד ' + p.left + ') · ' + HE_VERBS[p.kind].willExit + ' ' + p.end,
+    'detail.out': p => p.end + ' (לפני ' + p.ago + ')',                         // the tag already says יצאה / יצא
+    'detail.none': p => HE_VERBS[p.kind].willEnter + ' ' + p.start + ' (בעוד ' + p.left + ') · עד ' + p.end,       // the tag already says תצא / יצא
     'clock': 'עכשיו {time} ב{place}.',
     'sim': 'זמן מדומה: {when}',
     'error': 'הדפדפן הזה לא מצליח לחשב את הזמנים ({message}).',

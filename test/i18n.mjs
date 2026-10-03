@@ -58,15 +58,20 @@ const tags = s => [...new Set([...String(s).matchAll(/<\/?(\w+)/g)].map(m => m[1
   const p = { start: 'S', end: 'E', left: 'L', ago: 'A' };
   const expect = {
     'detail.in:shabbat': 'נכנסה S · תצא E (בעוד L)', 'detail.in:chag': 'נכנס S · יצא E (בעוד L)',
-    'detail.out:shabbat': 'יצאה E (לפני A)', 'detail.out:chag': 'יצא E (לפני A)',
-    'detail.none:shabbat': 'תיכנס S (בעוד L) · תצא E', 'detail.none:chag': 'יכנס S (בעוד L) · יצא E',
+    'detail.out:shabbat': 'E (לפני A)', 'detail.out:chag': 'E (לפני A)',
+    'detail.none:shabbat': 'תיכנס S (בעוד L) · עד E', 'detail.none:chag': 'יכנס S (בעוד L) · עד E',
   };
   const bad = Object.entries(expect).filter(([k, want]) => { const [key, kind] = k.split(':'); return L.t(key, { ...p, kind }) !== want; });
-  report(!bad.length, 'Hebrew detail lines use the right verb forms (נכנסה / יצאה / תצא for Shabbat, נכנס / יצא / יצא for a holiday)' +
+  report(!bad.length, 'Hebrew detail lines use the right verb forms (נכנסה / תצא / תיכנס for Shabbat, נכנס / יצא / יכנס for a holiday)' +
     (bad.length ? '  ' + bad.map(([k]) => k + ' => ' + L.t(k.split(':')[0], { ...p, kind: k.split(':')[1] })).join(' | ') : ''));
+  // the line under the name never says again what the tag above it says (an ended Shabbat is יצאה once, with the time after)
+  const said = ['in', 'out', 'none'].flatMap(st => ['shabbat', 'chag'].filter(kind =>
+    (' ' + L.t('detail.' + st, { ...p, kind }) + ' ').split(/\s+/).includes(L.t('tag.' + st + '.' + kind))).map(kind => st + ':' + kind));
+  report(!said.length, 'the Hebrew line under the name never repeats the word in the tag' + (said.length ? `  (repeated: ${said})` : ''));
   const En = I18N.create('en');
-  report(En.t('detail.in', { start: 'S', end: 'E', left: 'L' }) === 'Began S · ends E (in L)' && En.t('detail.out', { end: 'E', ago: 'A' }) === 'Ended E (A ago)',
-    'English detail lines');
+  report(En.t('detail.in', { start: 'S', end: 'E', left: 'L' }) === 'Began S · ends E (in L)' && En.t('detail.out', { end: 'today 19:00', ago: 'A' }) === 'Today 19:00 (A ago)' &&
+    En.t('detail.out', { end: 'Sat, 3 Oct 19:00', ago: 'A' }) === 'Sat, 3 Oct 19:00 (A ago)' && En.t('detail.none', { start: 'S', end: 'E', left: 'L' }) === 'Starts S (in L) · ends E',
+    'English detail lines (the ended line starts with a capital and does not repeat OUT)');
 }
 
 // 5. The words and titles you asked for, exactly.

@@ -12,7 +12,7 @@ Holidays are the days on which work is forbidden: Rosh Hashana, Yom Kippur, Sukk
 
 **The Hebrew title** asks about Shabbat while Shabbat is on (**האם יצאה שבת?**), and about the holiday once Shabbat is out but the holiday is still on (**האם יצא החג?**); otherwise it asks about the last one, or the next one if nothing has started. A Saturday that is also a holiday counts as Shabbat. The verbs in the line under the name, and in the tags for "ended" and "next", agree with it: feminine for Shabbat, masculine for a holiday. The tag for "on" is the neutral **בתוקף**. The English title is always "Is it over?" and its line talks about the whole period.
 
-Two buttons at the top (the top right in English, the top left in Hebrew, since the whole layout mirrors), each opening a panel that fades in and out:
+Switching language fades the words and buttons out, flips the language and direction while they are invisible, and fades them back in. Two buttons at the top (the top right in English, the top left in Hebrew, since the whole layout mirrors), each opening a panel that fades in and out:
 
 - **?** explains how the times are worked out, with the numbers for the period on the page;
 - **gear** has the settings, kept in a cookie on the device: **language** (Hebrew by default), **place** (Tel Aviv by default; Petah Tikva, Jerusalem, Haifa, Be'er Sheva, Amsterdam, London, New York) and **holidays** (Israel, or Diaspora with second days).

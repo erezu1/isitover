@@ -1,23 +1,47 @@
 <!doctype html>
-<html lang="en">
+<html lang="he" dir="rtl">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
-<title>Is it over?</title>
-<meta name="description" content="Is it over? Has Shabbat or the holiday ended? Worked out on your device, no network needed.">
+<title>האם יצאה שבת?</title>
+<meta name="description" content="האם יצאה שבת? Is it over? Has Shabbat or the holiday ended? Worked out on your device, no network needed.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%95%AF%3C/text%3E%3C/svg%3E">
+<script>
+  // The language and direction come from the cookie, before the first paint (Hebrew is the default).
+  (function () {
+    var m = /(?:^|; )isitover=([^;]*)/.exec(document.cookie), l = m && /(?:^|&)lang=(he|en)(?:&|$)/.exec(m[1]), c = l ? l[1] : 'he';
+    document.documentElement.lang = c;
+    document.documentElement.dir = c === 'he' ? 'rtl' : 'ltr';
+  })();
+</script>
 <style>
-  /* The title font is Syne ExtraBold (SIL Open Font License 1.1, see fonts/OFL-Syne.txt), cut down to the letters
-     of "Is it over?" and embedded, so it needs no network. Any other letter falls back to the system font. */
+  /* The display fonts are cut down to the letters the title and the answers use, and embedded, so they need no network
+     (see fonts/ for the licenses, and the README for how to cut them again). English: Syne ExtraBold, every Latin letter.
+     Hebrew: Rubik Black, every Hebrew letter, plus the space and punctuation. Any other character falls back to the system font. */
   @font-face {
-    font-family: "Syne Title"; font-style: normal; font-weight: 800; font-display: swap;
-    src: url(data:font/woff2;base64,d09GMgABAAAAAAUwABAAAAAACcgAAATVAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGhwbgW4cgUoGYD9TVEFUKgBsEQgKhgCEYAsgAAE2AiQDPAQgBYNkByAMBxvyB8geh+kGe3ZAUuRLZkE8j5s17ydBQl2yRsWprJhRE2rGNkvPhZ6L0Z64QxS75lrGMM0pkUQjLXqw73+AddgTl9MfS6P+/J+a4Cn9aC0c08acmkaWRmtZ0QSJaFGcYACahdsQt9sPsURJ/LYIEAMAKBSChmBgIghgMpePWrNui5+40UBonDh0gGg0AWSkzx7HBQgg6ChcKMaZKGroQIsVNBwAEP04AKJvZvBklwP37seZ6AgAICjAQENwo1CzYEoADFaEpeUKzSYYdIcTlx7vir6ZYKbcuoXgAFwgg6bRc3vuphSjrgNtmgjGypa1Fqv6Lr/FotEIWPjmSoUsnrs2G2e/g1HPUQ1VqJh5s1IwRoM9oyxIYR9cCntFLSDosAYrWGJgEBPy/YgLwfEWgLZQO0+zMECFVROwOR8pHWyuUpCFAjp+1HwTHsGyTy78/zvQ7pcfLDgfQH5VYcCiIbsJIOV2kEPtOzAYEgNQCICYmgWAAjQghQZ/XqcJJEmgobAst1GfIUEh+/zR6EP2O7gX3eNC5znbmc5ICGyCECPxAOnyPJAEXgLxAjGakffUK5jLOVmP7hc906l7/oQEPaZGtrry6tN2enQz6LnkjTfM8PS0HD4z45mKRPxx5z4Y8UzNNITfyIg9b3oEU5o9ymyN+wNLLBzGQjZMzbw+5rVpM/zGKxz2asTTDIjxb8zNO//2x1+XvY2ecyOY5enrZeAuhqZ7TOVUr2We91wv+AyHXRkxdK+uxM1ucllrPHGtHt3saWiN7TX7Y3tE8c3I4dOg5ZoUgvFyZn0E9otfPCA+FTNCfQeH/n3Y37xy87fHd9XfU37y2W9XTE4Eumz7rarzz3m0tnU/6b9m4zfdWbsbxtOfeHF4vOyse4YCxdS8s/4/y8GPX/9I3U03+S/u4teqByfa2wft12ouvuiVmgFbPGRg4pXqC0/Z1JPh83rn9GRu3tSfuarA6+vPoJThv/upcuVI+marIn/uOQ/8usvyUbDfe2tb8qaFI5oncUuj2rrRjtmec3pB5dIVQ3PD8VsOudi3ud6YufbxTes+TY//vsHwLxp3NmXWVixsW3dtfqgvnNlY/PHHJN8tZ225seTHw37kv+YJ+edEd9tXH2/5ykXuOes4/+q53vJN1tZFt+y78Ju5/5evblxy7LyAfV5B24aCwKJtuwenqv188czZ/59N8youLibxO+v/s1BedMBBXM4/OkAlpFx9iwCqulo9fNRfnfFLfnNp2pcA72w4KRbg/bVrGqK+/392jmsHAA4UAALfyeK8bob495QhCME+8fI+LXUF9fmYOTXK/OowD6vMn8xp1ZRlE94WIiVnYUgdaF14cfUXlIuniZM1BgS5WEMAN3ZZobuBx7hFp4UcZ9CKOI6hNXz8/fo8bZBlEeUgR56YGMSQZBVT+l6w1n5CbAGrBI3q1ajPkAGDQnbb37g+ZQjY8FjbXkOCxll8yvlUqhTlF9tmu23Wtr8OuKt2wKRRATakyAqsFrTHMdvn01v7lFZZyOI3SKkjj93BFjSsTw+sdKVJIYOC53ZYCum2kD2tyy5SocKAISGjArqV6xE0pkK3oHHDgibZyozpub36VOh3HLYh17z3ntpQCe55s34BPfoU0QAgOmyzIPkeiR49/UQ=) format("woff2");
+    font-family: "Syne Display"; font-style: normal; font-weight: 800; font-display: swap;
+    unicode-range: U+0020-007E, U+2019;
+    src: url(data:font/woff2;base64,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) format("woff2");
+  }
+  @font-face {
+    font-family: "Rubik Display"; font-style: normal; font-weight: 900; font-display: swap;
+    unicode-range: U+0590-05FF;
+    src: url(data:font/woff2;base64,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) format("woff2");
+  }
+  @font-face {
+    font-family: "Rubik Display"; font-style: normal; font-weight: 900; font-display: swap;
+    unicode-range: U+0020-007E, U+2019;
+    src: url(data:font/woff2;base64,d09GMgABAAAAAAPsAA8AAAAACMAAAAOUAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAG4MEHDoGYD9TVEFURABWEQgKhBSDOwsSAAE2AiQDIAQgBYQUByAMBxtPB1FUTcaR/TyMjVlPDrGRs11TrQc2xMUwLqVpn9r7Zno0rfHw337/22fmyf2YR00iJskqEY9uEQ/9R/DEIr4huXYvRl0WLxsTsWlqblf/G/RzD4A/jvm6KCwcReJuIJHiE3u0PI/kWUTbaDeg8Siy+GNSmv7FbXdsx23gyUKm8e8FGphXrzRuwrR5jNbm7NlGbVPkmj2ktoXu24EfHmr/QSUcwhmRPLau37ODikbLoMX28QOSDELWhtDXJSW3TWFHlRRCO5QMou0JhWQXHsf2z6sMDNbCXMFRBEyrz6s/LZQkWUm1AqMRYndSe3hVw8jBmkNeDcqVVESHBolSFXD9jEF0EDwlVqeuXgM+AhqiYS0EgIidaWw+p0w6nxYBpmbNxApqocNXDvB35hdyrD3jPFWLUpd4aA/+F6QivUZ7OCEYI6EVonPEwY2b9gW+FP3RKIRW8LKQog4EAqKaz4GEjFZwAq3gjQEaKCRJB0r0GNfQnkL1tdQuau+FBhoBQllWlYSo/TcFBWgGqMMjvAeUAARA4Iw2Kzurr1Y1VtNqOyNKuho2rOsAitsbzG9S23p3zTVXzOnRPt1gKVpuEQXAZklY5MKg0yVt+86O3t3LgzsvNzg/3aq9vYFy9MbVV38kre75fkXx8u3Xr9v1gVVp3mJoYhs3jqehLUbnA2k7ysgS30I2nMOULxQ8NuhbV5IT2AYOG8ZxyMoutIzAkSaxucCqLtD2fbXPn+ouKeExdSq76c3MBg1fVGHrBNs3tl1qPZMg5eRkni3j7p0otV/ICyV/fCw+xT05Bq8Zlz8mcsiwxYzA5lxpGpXBkn22JSCQpn29pwhc2XTYvyLnb1B/6+8/1N8dZvovodLFfAMVCQTvVf0CIfxGHcH/iUV6ZtYuMYhcKGMLM8phRz01aBevesCgsJ1gHV4AgCzQ0HlZlOpwxa+KFTq6YCVNvGZlA1QWl3BW2RAOzIr2FHyCRtpTVlUDbViFRhqcU6cB5qDE0CTb9Iw3ITbcDBn6fLx3ZGx0TLpbRlhsvEO3WHEe0uvc1LRYlASpUaJOhQp9AxlFQig2zV+FEl2sNHBW/5ycnSz1z0K6maMzmsWpM4uhIQxbm6PknFRknBoVqjRBHhQZmbLHNJdUFBcZDttNM9JjUGoaJAMb05PT9ChTFh2LApiVhF8sv7JohKLNkVEXE5Oepiz1HJcsHF9VbUMf7s+jVnEffwk=) format("woff2");
   }
   :root {
     --bg: #faf8f4; --fg: #1d1b17; --muted: #6a655b; --line: #e3ddd0;
     --yes: #146c36; --no: #a84a07; --none: #475569;
     --yes-bg: #dcf2e3; --no-bg: #fbe8d2; --none-bg: #e8e6df; --accent: #1d1b17; --on-accent: #faf8f4;
+    --display: "Syne Display", system-ui, -apple-system, "Segoe UI", sans-serif; --display-weight: 800;
+  }
+  :root:lang(he) {
+    --display: "Rubik Display", "Syne Display", system-ui, -apple-system, "Segoe UI", sans-serif; --display-weight: 900;
   }
   @media (prefers-color-scheme: dark) {
     :root {
@@ -39,7 +63,8 @@
   }
   :focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
 
-  .tools { position: fixed; top: 8px; right: 8px; display: flex; gap: 2px; }
+  /* Everything below uses logical properties (start / end), so right to left is the exact mirror of left to right. */
+  .tools { position: fixed; top: 8px; inset-inline-end: 8px; display: flex; gap: 2px; }
   .tool {
     width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%;
     display: grid; place-items: center; background: transparent; color: var(--muted); cursor: pointer;
@@ -48,14 +73,14 @@
   .tool svg { width: 24px; height: 24px; fill: currentColor; }
 
   .title {
-    margin: 0; font-family: "Syne Title", system-ui, -apple-system, "Segoe UI", sans-serif; font-weight: 800;
+    margin: 0; font-family: var(--display); font-weight: var(--display-weight);
     font-size: min(3.2rem, 8.6vw); line-height: 1.1; letter-spacing: -.01em;
   }
   .answer {
-    margin: -.16em 0 .1em; font-weight: 800; line-height: 1; letter-spacing: -.045em;   /* "no" and "yes" have no ascenders, so pull them up */
-    font-size: clamp(5rem, 28vw, 10rem);
+    margin: -.16em 0 .1em; font-family: var(--display); font-weight: var(--display-weight);
+    font-size: clamp(5rem, 28vw, 10rem); line-height: 1; letter-spacing: -.02em; white-space: nowrap;
   }
-  .answer.none { margin-top: -.02em; font-size: clamp(3.2rem, 16vw, 6.5rem); letter-spacing: -.035em; }
+  .answer.none { margin-top: .06em; }              /* "not shabat" has ascenders, "no" and "yes" do not */
   .answer.in { color: var(--no); }
   .answer.out { color: var(--yes); }
   .answer.none { color: var(--none); }
@@ -85,7 +110,7 @@
   .pad { padding: 20px; }
   dialog h2 { margin: 0; font-size: 1.25rem; line-height: 1.25; }
   .head { position: sticky; top: 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; padding: 18px 20px 10px; background: var(--bg); }
-  .x { flex: none; width: 36px; height: 36px; margin: -4px -8px 0 0; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--muted); font-size: 1.7rem; line-height: 1; cursor: pointer; }
+  .x { flex: none; width: 36px; height: 36px; margin-block-start: -4px; margin-inline-end: -8px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--muted); font-size: 1.7rem; line-height: 1; cursor: pointer; }
   .x:hover { background: var(--none-bg); color: var(--fg); }
 
   .field { display: block; margin: 0 0 1rem; padding: 0; border: 0; }
@@ -97,8 +122,7 @@
   .choice { display: flex; gap: .6rem; align-items: flex-start; padding: .35rem 0; cursor: pointer; }
   .choice input { margin: .3rem 0 0; width: 1.1rem; height: 1.1rem; accent-color: var(--accent); }
   .choice small { display: block; color: var(--muted); font-size: .85rem; }
-  .note { margin: 0 0 1rem; color: var(--muted); font-size: .85rem; }
-  .actions { display: flex; justify-content: space-between; gap: .6rem; }
+  .actions { display: flex; justify-content: space-between; gap: .6rem; margin-top: 1.4rem; }
   .actions button {
     padding: .6rem 1.1rem; font: inherit; font-weight: 600; border-radius: 10px; cursor: pointer;
     border: 1px solid var(--muted); background: transparent; color: var(--fg);
@@ -108,76 +132,92 @@
   .info { padding: 0 20px 22px; font-size: .95rem; }
   .info p { margin: .4rem 0; }
   .info h3 { margin: 1.3rem 0 .3rem; font-size: .78rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); }
-  .info ul { margin: .4rem 0; padding-left: 1.2rem; }
+  .info ul { margin: .4rem 0; padding-inline-start: 1.2rem; }
   .info li { margin: .25rem 0; }
   .info a { color: inherit; }
   .info table { width: 100%; margin: .4rem 0; border-collapse: collapse; }
   .info td { padding: .4rem 0; border-top: 1px solid var(--line); vertical-align: top; }
-  .info td:first-child { padding-right: .8rem; color: var(--muted); }
+  .info td:first-child { padding-inline-end: .8rem; color: var(--muted); }
   .info .names { font-weight: 600; }
+
+  /* Hebrew has no capitals and does not take letter spacing */
+  :lang(he) .pill, :lang(he) .info h3, :lang(he) .field > span, :lang(he) .field legend { letter-spacing: 0; text-transform: none; }
+  :lang(he) .pill { font-size: .85rem; }
+  :lang(he) .info h3, :lang(he) .field > span, :lang(he) .field legend { font-size: .9rem; }
+  :lang(he) .title { letter-spacing: 0; font-size: min(3.4rem, 10.5vw); }
+  :lang(he) .answer, :lang(he) .answer.none { letter-spacing: 0; margin-top: -.06em; }
 </style>
 </head>
 <body>
 <div class="tools">
-  <button class="tool" id="helpBtn" type="button" aria-label="How the times are worked out" title="How the times are worked out">
+  <button class="tool" id="helpBtn" type="button" data-i18n-attr="aria-label:tool.help,title:tool.help">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg>
   </button>
-  <button class="tool" id="gear" type="button" aria-label="Settings" title="Settings">
+  <button class="tool" id="gear" type="button" data-i18n-attr="aria-label:tool.settings,title:tool.settings">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.48.48 0 0 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
   </button>
 </div>
 
 <main>
   <p class="sim" id="sim" hidden></p>
-  <h1 class="title">Is it over?</h1>
-  <p class="answer none" id="answer" role="status" aria-live="polite">…</p>
+  <h1 class="title" id="title"></h1>
+  <p class="answer none" id="answer" role="status" aria-live="polite"></p>
   <p class="status"><span class="pill none" id="pill"></span><span id="what"></span></p>
   <p class="detail" id="detail"></p>
 
   <footer>
     <p id="clock"></p>
-    <noscript><p>This page needs JavaScript to work out the times.</p></noscript>
+    <noscript>
+      <p dir="rtl" lang="he">הדף הזה צריך JavaScript כדי לחשב את הזמנים.</p>
+      <p dir="ltr" lang="en">This page needs JavaScript to work out the times.</p>
+    </noscript>
   </footer>
 </main>
 
 <dialog id="settings" aria-labelledby="settingsTitle">
   <div class="pad">
-    <h2 id="settingsTitle" style="margin-bottom:1rem">Settings</h2>
-
-    <label class="field"><span>Place</span><select id="place"></select></label>
+    <h2 id="settingsTitle" data-i18n="settings.title" style="margin-bottom:1rem"></h2>
 
     <fieldset class="field">
-      <legend>Holidays</legend>
-      <label class="choice"><input type="radio" name="israel" value="1"><span>Israel<small>one day of Yom Tov</small></span></label>
-      <label class="choice"><input type="radio" name="israel" value="0"><span>Diaspora<small>two days of Yom Tov</small></span></label>
+      <legend data-i18n="settings.language"></legend>
+      <label class="choice"><input type="radio" name="lang" value="he"><span>עברית</span></label>
+      <label class="choice"><input type="radio" name="lang" value="en"><span>English</span></label>
     </fieldset>
 
-    <p class="note">Saved in a cookie on this device.</p>
+    <label class="field"><span data-i18n="settings.place"></span><select id="place"></select></label>
+
+    <fieldset class="field">
+      <legend data-i18n="settings.holidays"></legend>
+      <label class="choice"><input type="radio" name="israel" value="1"><span><span data-i18n="settings.israel"></span><small data-i18n="settings.israel.note"></small></span></label>
+      <label class="choice"><input type="radio" name="israel" value="0"><span><span data-i18n="settings.diaspora"></span><small data-i18n="settings.diaspora.note"></small></span></label>
+    </fieldset>
+
     <div class="actions">
-      <button type="button" id="reset">Reset</button>
-      <button type="button" class="primary" data-close>Done</button>
+      <button type="button" id="reset" data-i18n="settings.reset"></button>
+      <button type="button" class="primary" data-close data-i18n="settings.done"></button>
     </div>
   </div>
 </dialog>
 
 <dialog id="help" class="wide" aria-labelledby="helpTitle">
   <div class="head">
-    <h2 id="helpTitle">How the times are worked out</h2>
-    <button type="button" class="x" data-close aria-label="Close">×</button>
+    <h2 id="helpTitle" data-i18n="help.title"></h2>
+    <button type="button" class="x" data-close data-i18n-attr="aria-label:common.close">×</button>
   </div>
   <div class="info" id="helpBody"></div>
 </dialog>
 
 <script src="shabbat.js"></script>
+<script src="i18n.js"></script>
 <script>
 (function () {
   'use strict';
   const $ = id => document.getElementById(id);
   const set = (id, text) => { const el = $(id); if (el.textContent !== text) el.textContent = text; };
-  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const raw = I18N.raw;
 
   // ---- settings, kept in a cookie ------------------------------------------------------------------
-  const DEFAULTS = { place: 'tel-aviv', israel: true };
+  const DEFAULTS = { lang: I18N.DEFAULT, place: 'tel-aviv', israel: true };
   const COOKIE = 'isitover';
   const cookiePath = location.pathname.replace(/[^/]*$/, '') || '/';
 
@@ -187,6 +227,7 @@
       const raw = document.cookie.split('; ').find(c => c.startsWith(COOKIE + '='));
       if (raw) {
         const q = new URLSearchParams(raw.slice(COOKIE.length + 1));
+        if (I18N.LANGS[q.get('lang')]) s.lang = q.get('lang');
         if (Shabbat.PLACES[q.get('place')]) s.place = q.get('place');
         if (q.has('israel')) s.israel = q.get('israel') === '1';
       }
@@ -195,7 +236,7 @@
   }
   function saveSettings() {
     try {
-      const value = new URLSearchParams({ place: settings.place, israel: settings.israel ? 1 : 0 });
+      const value = new URLSearchParams({ lang: settings.lang, place: settings.place, israel: settings.israel ? 1 : 0 });
       document.cookie = COOKIE + '=' + value + '; max-age=31536000; path=' + cookiePath + '; SameSite=Lax' +
         (location.protocol === 'https:' ? '; Secure' : '');
     } catch (e) { /* the page still works, it just forgets */ }
@@ -204,124 +245,121 @@
     try { document.cookie = COOKIE + '=; max-age=0; path=' + cookiePath; } catch (e) { /* ignore */ }
   }
 
-  // ---- the engine for the current settings ---------------------------------------------------------
-  let settings = loadSettings(), S, tfmt, dfmt, sfmt;
-  const dayFmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'UTC', weekday: 'short', day: 'numeric', month: 'short' });
+  // ---- the language and the engine for the current settings ----------------------------------------
+  let settings = loadSettings(), L, S, f, fitKey = '';
   function useSettings() {
+    L = I18N.create(settings.lang);
     S = Shabbat.create(Object.assign({}, Shabbat.PLACES[settings.place], { israel: settings.israel }));
-    const tz = S.place.tz;
-    tfmt = new Intl.DateTimeFormat('en-GB', { timeZone: tz, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
-    sfmt = new Intl.DateTimeFormat('en-GB', { timeZone: tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' });
-    dfmt = new Intl.DateTimeFormat('en-GB', { timeZone: tz, weekday: 'short', day: 'numeric', month: 'short' });
+    f = L.format(S.place.tz);
+    document.documentElement.lang = L.code;
+    document.documentElement.dir = L.dir;
   }
-  const time = ms => tfmt.format(ms);
-  const date = ms => dfmt.format(ms);
+  function translateStatic() {                         // data-i18n="key" and data-i18n-attr="attribute:key,..."
+    for (const el of document.querySelectorAll('[data-i18n]')) {
+      const text = L.t(el.dataset.i18n);
+      if (el.textContent !== text) el.textContent = text;
+    }
+    for (const el of document.querySelectorAll('[data-i18n-attr]')) {
+      for (const pair of el.dataset.i18nAttr.split(',')) {
+        const [attr, key] = pair.split(':');
+        el.setAttribute(attr.trim(), L.t(key.trim()));
+      }
+    }
+  }
 
   // ?now=2026-10-03T19:06:00+03:00 pretends it is that moment, to preview each state.
   let skew = 0, simulated = false;
   const asked = new URLSearchParams(location.search).get('now');
   if (asked && isFinite(Date.parse(asked))) { skew = Date.parse(asked) - Date.now(); simulated = true; }
 
-  const when = (ms, today) => {
-    const diff = S.civilDay(ms) - today;
-    return (diff === 0 ? 'today' : diff === 1 ? 'tomorrow' : diff === -1 ? 'yesterday' : date(ms)) + ' ' + time(ms);
-  };
-  const span = ms => {
-    const m = Math.round(Math.abs(ms) / 60000);
-    if (m < 1) return 'less than a minute';
-    if (m < 60) return m + ' min';
-    const h = Math.floor(m / 60);
-    if (h < 48) return h + ' h' + (m % 60 ? ' ' + (m % 60) + ' min' : '');
-    return Math.floor(h / 24) + ' days';
-  };
-  const name = p => p.names.join(' + ');
+  // The big answer is as large as fits: Syne is wide, so "not shabat" shrinks to the width of the screen.
+  function fitAnswer() {
+    const el = $('answer');
+    el.style.fontSize = '';
+    const room = el.clientWidth, need = el.scrollWidth;
+    if (need > room) el.style.fontSize = (parseFloat(getComputedStyle(el).fontSize) * room / need * 0.97) + 'px';
+  }
 
   function render() {
     const now = Date.now() + skew;
-    const st = S.status(now), p = st.period, today = st.today, where = S.place.name;
+    const st = S.status(now), p = st.period, today = st.today, kind = st.kind;
+    const unit = L.segmented ? st.segment : p;          // Hebrew talks about the Shabbat or holiday it asks about
 
-    const answer = st.state === 'in' ? 'no' : st.state === 'out' ? 'yes' : 'not shabat';
+    const title = L.t('title.' + kind);
+    set('title', title);
+    if (document.title !== title) document.title = title;
+    const answer = L.t('answer.' + st.state);
     set('answer', answer);
     $('answer').className = 'answer ' + st.state;
     $('pill').className = 'pill ' + st.state;
-    set('pill', st.state === 'in' ? 'IN' : st.state === 'out' ? 'OUT' : 'NEXT');
-    set('what', name(p));
-    if (st.state === 'in') {
-      set('detail', 'Began ' + when(p.start, today) + ' · ends ' + when(p.end, today) + ' (in ' + span(st.untilEnd) + ')');
-    } else if (st.state === 'out') {
-      set('detail', 'Ended ' + when(p.end, today) + ' (' + span(-st.untilEnd) + ' ago)');
-    } else {
-      set('detail', 'Starts ' + when(p.start, today) + ' (in ' + span(st.untilStart) + ') · ends ' + when(p.end, today));
-    }
-
-    set('clock', 'It’s ' + time(now) + ' in ' + where + '.');
+    set('pill', L.t('tag.' + st.state + '.' + kind));
+    set('what', p.items.map(L.itemName).join(' + '));
+    set('detail', L.t('detail.' + st.state, {
+      kind,
+      start: f.when(unit.start, today, S.civilDay),
+      end: f.when(unit.end, today, S.civilDay),
+      left: f.span(st.state === 'none' ? unit.start - now : unit.end - now),
+      ago: f.span(now - unit.end)
+    }));
+    set('clock', L.t('clock', { time: f.time(now), place: L.placeName(S.place) }));
     $('sim').hidden = !simulated;
-    set('sim', 'Simulated time: ' + date(now) + ' ' + time(now));
+    set('sim', L.t('sim', { when: f.date(now) + ' ' + f.time(now) }));
+
+    const key = answer + '|' + L.code + '|' + $('answer').clientWidth;
+    if (key !== fitKey) { fitKey = key; fitAnswer(); }
   }
 
   // ---- the "?" panel: how the times are worked out -------------------------------------------------
   function renderInfo() {
     const now = Date.now() + skew, st = S.status(now), p = st.period, P = S.place;
-    const eve = p.first - 1, last = p.last;
+    const place = L.placeName(P), eve = p.first - 1, last = p.last;
     const sunsetMs = S.sunset(eve), sunsetMinute = Math.floor(sunsetMs / 60000) * 60000;
     const lift = Math.round((sunsetMs - Shabbat.create(Object.assign({}, P, { elevation: 0 })).sunset(eve)) / 1000);
-    const where = esc(P.name);
-    const lat = Math.abs(P.lat).toFixed(3) + '° ' + (P.lat >= 0 ? 'N' : 'S'), lon = Math.abs(P.lon).toFixed(3) + '° ' + (P.lon >= 0 ? 'E' : 'W');
-    const heightShort = P.elevation > 0 ? P.elevation + ' m above sea level' : 'sea level';
-    const heightNote = P.elevation > 0
-      ? ' (about ' + (lift < 120 ? lift + ' seconds' : (lift / 60).toFixed(1) + ' minutes') + ' later than at sea level)'
-      : '';
-    const nightfall = P.havdalahMinutes != null
-      ? 'It ends ' + P.havdalahMinutes + ' minutes after sunset'
-      : 'It ends when the sun is ' + P.havdalahDegrees + '° below the horizon (when three small stars can be seen)';
-    const nightMs = S.nightfall(last);
-    const days = P.israel
-      ? 'both days of Rosh Hashana, Yom Kippur, the first day of Sukkot, Shmini Atzeret (which is also Simchat Torah), the first and seventh days of Pesach, and Shavuot'
-      : 'both days of Rosh Hashana, Yom Kippur, the first two days of Sukkot, Shmini Atzeret and Simchat Torah, the first two and last two days of Pesach, and the two days of Shavuot';
+    const up = P.elevation > 0;
+    const h = (key, params) => L.h(key, params);
+    const row = (label, value) => '<tr><td>' + label + '</td><td>' + value + '</td></tr>';
+    const ends = P.havdalahMinutes != null ? h('help.ends.minutes', { n: P.havdalahMinutes }) : h('help.ends.degrees', { deg: P.havdalahDegrees });
 
     $('helpBody').innerHTML =
-      '<p>The page does the sums itself, on your device: the sun\'s position and the Hebrew calendar. Nothing is sent anywhere, and it never goes out of date.</p>' +
+      '<p>' + h('help.intro') + '</p>' +
 
-      '<h3>Your settings</h3>' +
-      '<p><b>' + where + '</b>, ' + lat + ', ' + lon + ', ' + heightShort + '.</p>' +
-      '<p>' + (P.israel ? 'Holidays as in Israel: one day of Yom Tov.' : 'Holidays as in the Diaspora: two days of Yom Tov.') +
-      ' Times are always in ' + where + ' time (' + esc(P.tz) + '), whatever your own clock says.</p>' +
+      '<h3>' + h('help.settings.h') + '</h3>' +
+      '<p>' + h('help.place', { place, coords: f.coords(P.lat, P.lon), height: raw(up ? h('help.height.up', { m: P.elevation }) : h('help.height.sea')) }) + '</p>' +
+      '<p>' + h(P.israel ? 'help.holidays.israel' : 'help.holidays.diaspora', { place, tz: P.tz }) + '</p>' +
 
-      '<h3>The answer</h3>' +
-      '<ul><li><b>no</b>: Shabbat or a holiday is on, from candle lighting until it ends.</li>' +
-      '<li><b>yes</b>: it ended earlier today, after nightfall.</li>' +
-      '<li><b>not shabat</b>: neither is on.</li></ul>' +
+      '<h3>' + h('help.answer.h') + '</h3>' +
+      '<ul><li>' + h('help.answer.in') + '</li><li>' + h('help.answer.out') + '</li><li>' + h('help.answer.none') + '</li></ul>' +
 
-      '<h3>When it begins</h3>' +
-      '<p>Shabbat and holidays begin at candle lighting. Sunset is when the sun\'s upper edge meets the horizon, seen from ' +
-      heightShort + heightNote + '. Candle lighting is that minute (seconds dropped) minus ' + P.candleMinutes +
-      ' minutes, and one more minute to be safe: ' + (P.candleMinutes + 1) + ' minutes in all.</p>' +
+      '<h3>' + h('help.begins.h') + '</h3>' +
+      '<p>' + h('help.begins', {
+        from: raw(up ? h('help.begins.from.up', { m: P.elevation }) : h('help.begins.from.sea')),
+        note: raw(up ? h('help.begins.note', { lift: f.lift(lift) }) : ''),
+        minutes: P.candleMinutes, total: P.candleMinutes + 1
+      }) + '</p>' +
 
-      '<h3>When it ends</h3>' +
-      '<p>' + esc(nightfall) + ', rounded up to the next whole minute.</p>' +
+      '<h3>' + h('help.ends.h') + '</h3>' +
+      '<p>' + ends + '</p>' +
 
-      '<h3>Which days</h3>' +
-      '<p>Every Shabbat, and the holidays on which work is forbidden: ' + days + '.</p>' +
-      '<p>Days that touch, such as a holiday followed by Shabbat, are one period: it begins at the first candle lighting and ends at the last nightfall.</p>' +
+      '<h3>' + h('help.days.h') + '</h3>' +
+      '<p>' + h('help.days', { days: raw(h(P.israel ? 'help.days.israel' : 'help.days.diaspora')) }) + '</p>' +
+      '<p>' + h('help.days.touch') + '</p>' +
 
-      '<h3>The numbers for the one on the page</h3>' +
-      '<p class="names">' + esc(name(p)) + '</p>' +
+      '<h3>' + h('help.numbers.h') + '</h3>' +
+      '<p class="names">' + I18N.esc(p.items.map(L.itemName).join(' + ')) + '</p>' +
       '<table>' +
-      '<tr><td>Sunset, ' + dayFmt.format(eve * 86400000) + '</td><td>' + sfmt.format(sunsetMs) + '</td></tr>' +
-      '<tr><td>Candle lighting</td><td>' + time(p.start) + ' (' + time(sunsetMinute) + ' minus ' + (P.candleMinutes + 1) + ' min)</td></tr>' +
-      '<tr><td>Nightfall, ' + dayFmt.format(last * 86400000) + '</td><td>' + sfmt.format(nightMs) + '</td></tr>' +
-      '<tr><td>Ends</td><td>' + time(p.end) + ' (rounded up)</td></tr>' +
+      row(h('help.num.sunset', { day: f.dayLabel(eve) }), f.seconds(sunsetMs)) +
+      row(h('help.num.candle'), h('help.num.candle.v', { time: f.time(p.start), sunsetMinute: f.time(sunsetMinute), minutes: P.candleMinutes + 1 })) +
+      row(h('help.num.night', { day: f.dayLabel(last) }), f.seconds(S.nightfall(last))) +
+      row(h('help.num.ends'), h('help.num.ends.v', { time: f.time(p.end) })) +
       '</table>' +
 
-      '<h3>Why another site can differ by a minute</h3>' +
-      '<p>There is no single official time, because sites round differently. This page rounds the stringent way, an earlier start and a later end, as yeshiva.org.il does for Tel Aviv. hebcal.com cuts the sunset to the minute and rounds nightfall to the nearest minute, so its end can be a minute earlier. These are calculated times, not a ruling: follow your own community\'s custom.</p>' +
+      '<h3>' + h('help.differ.h') + '</h3>' +
+      '<p>' + h('help.differ') + '</p>' +
 
-      '<h3>How it was checked</h3>' +
-      '<ul><li>yeshiva.org.il, Tel Aviv, Hebrew year 5787: the same end of Shabbat on 59 of 59 days and the same candle lighting on 58 of 59; the rest a minute off.</li>' +
-      '<li>The hebcal library: the same sun and the same Shabbat and holiday periods for Tel Aviv on every day from 2024 to 2099, and for 11 other places in Israel and abroad from 2024 to 2040. hebcal.com\'s own site agrees too.</li>' +
-      '<li>The US Naval Observatory: sunset within 29 seconds.</li>' +
-      '<li>Only Tel Aviv was compared with yeshiva.org.il; the other places use the same rules.</li></ul>' +
-      '<p>Source code and tests: <a href="https://github.com/erezu1/isitover">github.com/erezu1/isitover</a></p>';
+      '<h3>' + h('help.checked.h') + '</h3>' +
+      '<ul><li>' + h('help.checked.yeshiva') + '</li><li>' + h('help.checked.hebcal') + '</li>' +
+      '<li>' + h('help.checked.usno') + '</li><li>' + h('help.checked.only') + '</li></ul>' +
+      '<p>' + h('help.source') + '</p>';
   }
 
   // ---- the panels, with a fade ---------------------------------------------------------------------
@@ -357,14 +395,26 @@
   }
 
   // ---- the settings --------------------------------------------------------------------------------
-  $('place').replaceChildren(...Object.keys(Shabbat.PLACES).map(key => {
-    const o = document.createElement('option');
-    o.value = key; o.textContent = Shabbat.PLACES[key].name;
-    return o;
-  }));
+  function fillPlaces() {
+    $('place').replaceChildren(...Object.keys(Shabbat.PLACES).map(key => {
+      const o = document.createElement('option');
+      o.value = key; o.textContent = L.placeName(Shabbat.PLACES[key]);
+      return o;
+    }));
+    $('place').value = settings.place;
+  }
   function showSettings() {
     $('place').value = settings.place;
     for (const r of document.querySelectorAll('input[name=israel]')) r.checked = (r.value === '1') === settings.israel;
+    for (const r of document.querySelectorAll('input[name=lang]')) r.checked = r.value === settings.lang;
+  }
+  function applyLanguage() {                           // everything that has words in it
+    useSettings();
+    translateStatic();
+    fillPlaces();
+    showSettings();
+    fitKey = '';
+    render();
   }
   function changed() {
     useSettings();
@@ -373,6 +423,7 @@
   }
   $('gear').addEventListener('click', () => openPanel(settingsDlg, showSettings));
   $('helpBtn').addEventListener('click', () => openPanel(helpDlg, renderInfo));
+  for (const r of document.querySelectorAll('input[name=lang]')) r.addEventListener('change', e => { settings.lang = e.target.value; applyLanguage(); saveSettings(); });
   $('place').addEventListener('change', e => {
     settings.place = e.target.value;
     settings.israel = !!Shabbat.PLACES[settings.place].israel;   // each place starts with its own holiday schedule
@@ -383,19 +434,22 @@
   $('reset').addEventListener('click', () => {
     settings = Object.assign({}, DEFAULTS);
     forgetSettings();
-    showSettings();
-    useSettings();
-    render();
+    applyLanguage();
   });
 
   try {
     useSettings();
+    translateStatic();
+    fillPlaces();
+    showSettings();
     render();
     setInterval(render, 1000);
     document.addEventListener('visibilitychange', render);
+    window.addEventListener('resize', () => { fitKey = ''; render(); });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { fitKey = ''; render(); });
   } catch (e) {
-    set('answer', '?');
-    set('detail', 'This browser cannot work out the times (' + e.message + ').');
+    $('answer').textContent = '?';
+    $('detail').textContent = (L ? L.t('error', { message: e.message }) : e.message);
   }
 })();
 </script>

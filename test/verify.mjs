@@ -153,5 +153,55 @@ for (const loc of locations) {
   report(threw, 'no sunset at the pole: status() throws instead of returning nonsense');
 }
 
+// 6. Segments: which run (Shabbat or holiday) a question is about, and where one hands over to the next.
+//    A Saturday is Shabbat even when it is also a holiday. Shabbat hands over to a holiday when Shabbat ends,
+//    and a holiday to Shabbat at Friday's candle lighting. The question is about the one on now, else the last, else the next.
+{
+  const tlv = Shabbat.create('tel-aviv');
+  const cases = [
+    // Rosh Hashana 5787: Friday evening, Saturday (Shabbat and the first day), Sunday (the second day)
+    ['2026-09-11T18:40:00+03:00', 'in', 'shabbat', 'Rosh Hashana: Friday evening, Shabbat has come in'],
+    ['2026-09-12T12:00:00+03:00', 'in', 'shabbat', 'Rosh Hashana: Saturday, Shabbat and the first day'],
+    ['2026-09-12T19:20:00+03:00', 'in', 'shabbat', 'Rosh Hashana: Saturday, just before Shabbat ends'],
+    ['2026-09-12T19:30:00+03:00', 'in', 'chag', 'Rosh Hashana: Shabbat is out but the holiday is still in'],
+    ['2026-09-13T12:00:00+03:00', 'in', 'chag', 'Rosh Hashana: Sunday, the second day'],
+    ['2026-09-13T19:30:00+03:00', 'out', 'chag', 'Rosh Hashana: ended, the question stays on the last one'],
+    // Shavuot 5787 is a Friday, followed by Shabbat
+    ['2027-06-10T12:00:00+03:00', 'none', 'chag', 'Shavuot: Thursday noon, the next one starts with the holiday'],
+    ['2027-06-10T21:00:00+03:00', 'in', 'chag', 'Shavuot: Thursday night, the holiday has come in'],
+    ['2027-06-11T12:00:00+03:00', 'in', 'chag', 'Shavuot: Friday'],
+    ['2027-06-11T19:30:00+03:00', 'in', 'shabbat', 'Shavuot: Friday after candle lighting, Shabbat takes over'],
+    ['2027-06-12T21:00:00+03:00', 'out', 'shabbat', 'Shavuot: after Shabbat ended'],
+    // single days
+    ['2026-10-03T12:00:00+03:00', 'in', 'shabbat', 'Shmini Atzeret on a Saturday counts as Shabbat'],
+    ['2026-09-21T12:00:00+03:00', 'in', 'chag', 'Yom Kippur on a Monday'],
+    ['2026-10-04T10:00:00+03:00', 'none', 'shabbat', 'an ordinary Sunday, the next one is Shabbat'],
+  ];
+  for (const [iso, state, kind, what] of cases) {
+    const s = tlv.status(Date.parse(iso));
+    report(s.state === state && s.kind === kind && s.segment.kind === kind, `${iso}  ${state.padEnd(4)} ${kind.padEnd(7)} ${what}${s.state === state && s.kind === kind ? '' : `  (got ${s.state} ${s.kind})`}`);
+  }
+  const rh = tlv.status(Date.parse('2026-09-12T12:00:00+03:00')).period;
+  report(rh.segments.length === 2 && rh.segments[0].start === rh.start && rh.segments[0].end === tlv.havdalah(dayOf(2026, 9, 12)) &&
+         rh.segments[1].start === rh.segments[0].end && rh.segments[1].end === rh.end,
+         `Rosh Hashana hands over at Shabbat's end: ${clock(rh.segments[0].end)}, and ends ${clock(rh.end)}`);
+  const sh = tlv.status(Date.parse('2027-06-11T12:00:00+03:00')).period;
+  report(sh.segments.length === 2 && sh.segments[0].end === tlv.candleLighting(dayOf(2027, 6, 11)) && sh.segments[1].start === sh.segments[0].end && sh.segments[1].end === sh.end,
+         `Shavuot hands over at Friday's candle lighting: ${clock(sh.segments[0].end)}, and ends ${clock(sh.end)}`);
+
+  // every period 2024-2099, in Israel and in the Diaspora: the runs tile the period, alternate, and Shabbat is exactly the Saturdays
+  for (const S of [tlv, Shabbat.create('amsterdam')]) {
+    let bad = 0, n = 0;
+    for (let p = S.nextPeriod(dayOf(2024, 1, 1)); p.first <= dayOf(2099, 12, 31); p = S.nextPeriod(p.last + 1), n++) {
+      const g = p.segments;
+      const ok = g.length >= 1 && g[0].start === p.start && g[g.length - 1].end === p.end &&
+        g.every((s, i) => s.end > s.start && (i === 0 || (s.start === g[i - 1].end && s.kind !== g[i - 1].kind)) &&
+          s.days.every(d => (new Date(d.day * DAY).getUTCDay() === 6) === (s.kind === 'shabbat')));
+      if (!ok && bad++ < 3) console.log(`      period ${p.names.join(' + ')} ${clock(p.start)}: ${g.map(s => s.kind + ' ' + clock(s.start) + '-' + clock(s.end)).join(', ')}`);
+    }
+    report(bad === 0, `${S.place.name}: ${n} periods 2024-2099, their runs tile the period, alternate, and Shabbat is exactly the Saturdays`);
+  }
+}
+
 console.log(failed ? `\n${failed} check(s) failed` : '\nall checks passed');
 process.exit(failed ? 1 : 0);

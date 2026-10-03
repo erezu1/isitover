@@ -12,9 +12,17 @@
  *                   names                 ['Shabbat', 'Shmini Atzeret / Simchat Torah']
  *                   items                 the same with ids, Hebrew names and kind ('shabbat' | 'yomtov')
  *                   days                  [{ day, items }] for each rest day, with the day of the festival
+ *                   segments              the same period cut into runs of one kind (below)
  *                   hasShabbat, hasYomTov
  *   s.untilEnd    ms until it ends (negative once it has);  s.untilStart  ms until it starts
  *   s.upcoming    the periods after that one (default three)
+ *   s.kind        'shabbat' or 'chag': what a question about "it" should be about (below)
+ *   s.segment     that run: { kind, first, last, start, end, items, names, days }
+ *
+ * A Saturday is Shabbat even when it is also a holiday; any other rest day is a holiday ('chag'). A period is cut
+ * into runs of one kind: Shabbat hands over to a holiday when Shabbat ends, and a holiday to Shabbat at Friday's
+ * candle lighting. s.segment is the run that is on now, the last one once the period has ended, and the first one
+ * while the period is still to come, so the question is always about the current, or else the last, or else the next.
  *
  * A "period" runs from candle lighting on the evening before the first rest day (Shabbat or Yom Tov) to
  * Havdalah on the last day of an unbroken run, so Yom Tov followed by Shabbat is one period.
@@ -104,7 +112,7 @@
   const NAMES = {
     'shabbat': ['Shabbat', 'שבת'],
     'rosh-hashana': ['Rosh Hashana', 'ראש השנה'],
-    'yom-kippur': ['Yom Kippur', 'יום כיפור'],
+    'yom-kippur': ['Yom Kippur', 'יום הכיפורים'],
     'sukkot': ['Sukkot', 'סוכות'],
     'shmini-atzeret': ['Shmini Atzeret', 'שמיני עצרת'],
     'simchat-torah': ['Simchat Torah', 'שמחת תורה'],
@@ -160,14 +168,15 @@
   // ---- places --------------------------------------------------------------------------------------
   // Coordinates and elevations are hebcal's. Israeli places use their elevation (as yeshiva.org.il does for
   // Tel Aviv and Jerusalem); abroad the sea-level sunset is the usual practice.
+  // `name` is English and `nameHe` Hebrew; add both for a new place.
   const PLACES = {
-    'tel-aviv':   { name: 'Tel Aviv',    lat: 32.08088, lon: 34.78057,  tz: 'Asia/Jerusalem',   israel: true,  elevation: 15,  candleMinutes: 20 },
-    'jerusalem':  { name: 'Jerusalem',   lat: 31.76904, lon: 35.21633,  tz: 'Asia/Jerusalem',   israel: true,  elevation: 786, candleMinutes: 40 },
-    'haifa':      { name: 'Haifa',       lat: 32.81841, lon: 34.9885,   tz: 'Asia/Jerusalem',   israel: true,  elevation: 40,  candleMinutes: 30 },
-    'beer-sheva': { name: "Be'er Sheva", lat: 31.25181, lon: 34.7913,   tz: 'Asia/Jerusalem',   israel: true,  elevation: 285, candleMinutes: 20 },
-    'amsterdam':  { name: 'Amsterdam',   lat: 52.37403, lon: 4.88969,   tz: 'Europe/Amsterdam', israel: false, candleMinutes: 18 },
-    'london':     { name: 'London',      lat: 51.50853, lon: -0.12574,  tz: 'Europe/London',    israel: false, candleMinutes: 18 },
-    'new-york':   { name: 'New York',    lat: 40.71427, lon: -74.00597, tz: 'America/New_York', israel: false, candleMinutes: 18 }
+    'tel-aviv':   { name: 'Tel Aviv',    nameHe: 'תל אביב',   lat: 32.08088, lon: 34.78057,  tz: 'Asia/Jerusalem',   israel: true,  elevation: 15,  candleMinutes: 20 },
+    'jerusalem':  { name: 'Jerusalem',   nameHe: 'ירושלים',   lat: 31.76904, lon: 35.21633,  tz: 'Asia/Jerusalem',   israel: true,  elevation: 786, candleMinutes: 40 },
+    'haifa':      { name: 'Haifa',       nameHe: 'חיפה',      lat: 32.81841, lon: 34.9885,   tz: 'Asia/Jerusalem',   israel: true,  elevation: 40,  candleMinutes: 30 },
+    'beer-sheva': { name: "Be'er Sheva", nameHe: 'באר שבע',   lat: 31.25181, lon: 34.7913,   tz: 'Asia/Jerusalem',   israel: true,  elevation: 285, candleMinutes: 20 },
+    'amsterdam':  { name: 'Amsterdam',   nameHe: 'אמסטרדם',   lat: 52.37403, lon: 4.88969,   tz: 'Europe/Amsterdam', israel: false, candleMinutes: 18 },
+    'london':     { name: 'London',      nameHe: 'לונדון',    lat: 51.50853, lon: -0.12574,  tz: 'Europe/London',    israel: false, candleMinutes: 18 },
+    'new-york':   { name: 'New York',    nameHe: 'ניו יורק',  lat: 40.71427, lon: -74.00597, tz: 'America/New_York', israel: false, candleMinutes: 18 }
   };
 
   function normalize(place) {
@@ -176,7 +185,7 @@
     const israel = !!p.israel;
     const byMinutes = p.havdalahMinutes != null;
     const q = {
-      name: p.name || 'here', lat: +p.lat, lon: +p.lon, tz: p.tz, israel,
+      name: p.name || 'here', nameHe: p.nameHe || p.name || 'here', lat: +p.lat, lon: +p.lon, tz: p.tz, israel,
       elevation: p.elevation != null ? +p.elevation : 0,
       candleMinutes: p.candleMinutes != null ? +p.candleMinutes : israel ? 20 : 18,
       havdalahDegrees: byMinutes ? null : p.havdalahDegrees != null ? +p.havdalahDegrees : 8.5,
@@ -221,22 +230,41 @@
 
     const items = day => memo('i' + day, () => itemsOn(day, P.israel));
 
+    const distinct = days => {                        // the items of some days, each once, in order
+      const seen = new Map();
+      for (const d of days) for (const it of d.items) if (!seen.has(it.id)) seen.set(it.id, it);
+      return [...seen.values()];
+    };
+
     function periodAround(day) {                      // the unbroken run of rest days that includes `day`
       let first = day, last = day;
       while (items(first - 1).length) first--;
       while (items(last + 1).length) last++;
-      const days = [], seen = new Map();
-      for (let d = first; d <= last; d++) {
-        const its = items(d);
-        days.push({ day: d, items: its });
-        for (const it of its) if (!seen.has(it.id)) seen.set(it.id, it);
-      }
-      const list = [...seen.values()];
+      const days = [];
+      for (let d = first; d <= last; d++) days.push({ day: d, items: items(d) });
       const start = candleLighting(first - 1), end = havdalah(last);
       if (!isFinite(start) || !isFinite(end)) throw new Error('no sunset or nightfall in ' + P.name + ' on that day');
+
+      // runs of one kind. Shabbat hands over to a holiday when it ends, a holiday to Shabbat at Friday's candle lighting
+      const segments = [];
+      for (const d of days) {
+        const kind = weekday(d.day) === 6 ? 'shabbat' : 'chag', prev = segments[segments.length - 1];
+        if (prev && prev.kind === kind) { prev.last = d.day; prev.days.push(d); }
+        else segments.push({ kind, first: d.day, last: d.day, days: [d] });
+      }
+      segments.forEach((s, i) => {
+        s.start = i === 0 ? start : s.kind === 'shabbat' ? candleLighting(s.first - 1) : havdalah(segments[i - 1].last);
+      });
+      segments.forEach((s, i) => {
+        s.end = i + 1 < segments.length ? segments[i + 1].start : end;
+        s.items = distinct(s.days);
+        s.names = s.items.map(it => it.en);
+      });
+
+      const list = distinct(days);
       return {
-        first, last, start, end, days, items: list, names: list.map(i => i.en),
-        hasShabbat: seen.has('shabbat'), hasYomTov: list.some(i => i.kind === 'yomtov')
+        first, last, start, end, days, segments, items: list, names: list.map(i => i.en),
+        hasShabbat: list.some(i => i.id === 'shabbat'), hasYomTov: list.some(i => i.kind === 'yomtov')
       };
     }
     function nextPeriod(day) {                        // the one that includes `day`, or else the next to come
@@ -252,8 +280,12 @@
       else state = nowMs >= period.start ? 'in' : 'none';
       const upcoming = [];
       for (let p = period; upcoming.length < howManyUpcoming;) upcoming.push(p = nextPeriod(p.last + 1));
+      const segs = period.segments;                   // the one on now, else the last (it ended), else the first (to come)
+      const segment = state === 'none' ? segs[0]
+        : state === 'out' ? segs[segs.length - 1]
+        : segs.find(s => nowMs >= s.start && nowMs < s.end) || segs[segs.length - 1];
       return {
-        state, now: nowMs, today, period, upcoming,
+        state, kind: segment.kind, segment, now: nowMs, today, period, upcoming,
         untilStart: period.start - nowMs, untilEnd: period.end - nowMs
       };
     }

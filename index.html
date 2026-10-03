@@ -441,7 +441,7 @@
 
   // When it begins: the sun with its top edge on the horizon, seen from the place's height; candle lighting before it.
   function illBegins(o) {
-    const p = pen(o.rtl), H = 130, hor = 56, eye = o.height ? 34 : hor - 3, sx = 252, r = 11;
+    const p = pen(o.rtl), hor = o.height ? 56 : 32, H = hor + 74, eye = o.height ? hor - 22 : hor - 3, sx = 252, r = 11;
     let s = '';
     s += p.line('il-line', 16, hor, 304, hor);
     s += '<path class="il-sunline" d="M' + p.X(sx - 22) + ' ' + (hor - 3) + 'Q' + p.X(sx) + ' ' + (hor - 16) + ' ' + p.X(sx + 22) + ' ' + (hor - 3) + '" opacity=".55"/>';
@@ -450,7 +450,7 @@
     if (o.height) { s += p.line('il-ink', 52, hor, 52, eye + 4); s += p.text('il-t', 60, eye + 12, o.height); }
     s += p.dot('il-dot', 52, eye, 3);
     // the time axis: candle lighting, then sunset
-    const ax = 100, cx = 70;
+    const ax = hor + 44, cx = 70;
     s += p.line('il-faint', 30, ax, 290, ax);
     s += p.line('il-line', cx, ax - 5, cx, ax + 5) + p.line('il-line', sx, ax - 5, sx, ax + 5);
     s += p.candle(cx, ax - 9);

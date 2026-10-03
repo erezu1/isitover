@@ -94,14 +94,14 @@
     }
   }
   * { box-sizing: border-box; }
-  html { -webkit-text-size-adjust: 100%; }
+  html { -webkit-text-size-adjust: 100%; overscroll-behavior: none; }   /* a one-screen page: no rubber-band drag */
   body {
     margin: 0; background: var(--bg); color: var(--fg);
     font: 16px/1.5 var(--text);
     font-variant-numeric: tabular-nums;
   }
   main {
-    min-height: 100vh; min-height: 100dvh; max-width: 36rem; margin: 0 auto;
+    min-height: 100vh; min-height: 100svh; max-width: 36rem; margin: 0 auto;   /* svh: the height with the browser's bars showing, so it never overflows */
     padding: 56px 16px 32px; display: flex; flex-direction: column; justify-content: center;
   }
   :focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
@@ -172,7 +172,7 @@
     width: min(92vw, 24rem); max-height: min(88vh, 44rem); max-height: min(88dvh, 44rem); padding: 0; overflow: auto;
     border: 1px solid var(--line); border-radius: 16px; background: var(--bg); color: var(--fg);
     box-shadow: 0 12px 40px rgba(0, 0, 0, .25);
-    opacity: 0; transition: opacity .24s ease;
+    opacity: 0; transition: opacity .24s ease; overscroll-behavior: contain;
   }
   dialog.show { opacity: 1; }
   dialog::backdrop { background: rgba(0, 0, 0, 0); transition: background-color .24s ease; }

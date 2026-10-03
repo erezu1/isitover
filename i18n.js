@@ -128,9 +128,9 @@
   function formatEn(tz) {
     const b = base('en-GB', tz);
     return Object.assign(b, {
-      when(ms, today, civilDay) {                     // today 19:00, tomorrow 19:00, Fri 9 Oct 17:55
+      when(ms, today, civilDay) {                     // today at 19:00, tomorrow at 19:00, Fri 9 Oct at 17:55
         const diff = civilDay(ms) - today;
-        return (diff === 0 ? 'today' : diff === 1 ? 'tomorrow' : diff === -1 ? 'yesterday' : b.date(ms)) + ' ' + b.time(ms);
+        return (diff === 0 ? 'today' : diff === 1 ? 'tomorrow' : diff === -1 ? 'yesterday' : b.date(ms)) + ' at ' + b.time(ms);
       },
       span(ms) {                                      // 30 min, 1 h 12 min, 5 days
         const m = Math.round(Math.abs(ms) / MIN);

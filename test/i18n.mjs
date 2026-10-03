@@ -69,8 +69,8 @@ const tags = s => [...new Set([...String(s).matchAll(/<\/?(\w+)/g)].map(m => m[1
     (' ' + L.t('detail.' + st, { ...p, kind }) + ' ').split(/\s+/).includes(L.t('tag.' + st + '.' + kind))).map(kind => st + ':' + kind));
   report(!said.length, 'the Hebrew line under the name never repeats the word in the tag' + (said.length ? `  (repeated: ${said})` : ''));
   const En = I18N.create('en');
-  report(En.t('detail.in', { start: 'S', end: 'E', left: 'L' }) === 'Began S · ends E (in L)' && En.t('detail.out', { end: 'today 19:00', ago: 'A' }) === 'Today 19:00 (A ago)' &&
-    En.t('detail.out', { end: 'Sat, 3 Oct 19:00', ago: 'A' }) === 'Sat, 3 Oct 19:00 (A ago)' && En.t('detail.none', { start: 'S', end: 'E', left: 'L' }) === 'Starts S (in L) · ends E',
+  report(En.t('detail.in', { start: 'S', end: 'E', left: 'L' }) === 'Began S · ends E (in L)' && En.t('detail.out', { end: 'today at 19:00', ago: 'A' }) === 'Today at 19:00 (A ago)' &&
+    En.t('detail.out', { end: 'Sat 3 Oct at 19:00', ago: 'A' }) === 'Sat 3 Oct at 19:00 (A ago)' && En.t('detail.none', { start: 'S', end: 'E', left: 'L' }) === 'Starts S (in L) · ends E',
     'English detail lines (the ended line starts with a capital and does not repeat OUT)');
 }
 
@@ -111,7 +111,7 @@ const tags = s => [...new Set([...String(s).matchAll(/<\/?(\w+)/g)].map(m => m[1
     // after "עד" the weekday has no ב in front: עד שבת, 10 באוק׳ ב-19:00 (not עד בשבת)
     [f.when(t + 6 * DAYMS, today, S.civilDay, true), 'יום ו׳, 9 באוק׳ ב-19:00'], [f.when(t + 7 * DAYMS, today, S.civilDay, true), 'שבת, 10 באוק׳ ב-19:00'],
     [f.when(t + DAYMS, today, S.civilDay, true), 'מחר ב-19:00'],
-    [e.when(t, today, S.civilDay), 'today 19:00'], [e.when(t + 6 * DAYMS, today, S.civilDay), 'Fri 9 Oct 19:00'],
+    [e.when(t, today, S.civilDay), 'today at 19:00'], [e.when(t - DAYMS, today, S.civilDay), 'yesterday at 19:00'], [e.when(t + 6 * DAYMS, today, S.civilDay), 'Fri 9 Oct at 19:00'],
   ];
   const bad3 = cases.filter(([got, want]) => got !== want);
   report(!bad3.length, 'Hebrew and English day words (today / tomorrow / yesterday / a weekday and date)' + (bad3.length ? '  ' + bad3.map(([g, w]) => `${g} != ${w}`).join(' | ') : ''));

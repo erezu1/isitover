@@ -296,7 +296,7 @@
 </dialog>
 
 <script src="shabbat.js?v=101401f9"></script>
-<script src="i18n.js?v=2f0eb2d3"></script>
+<script src="i18n.js?v=8d551ec3"></script>
 <script>
 (function () {
   'use strict';
@@ -483,10 +483,8 @@
   }
 
   // ---- installing as an app: a button by the settings, and on phones an invitation ------------------
-  // Chrome offers its own install prompt through an event. Safari on iOS has none, so there the card says how (Share, then
-  // Add to Home Screen), and any other browser gets the plain words (the browser's menu). The button by the settings is there
-  // whenever the page is not already running as an installed app. ?install=ios, ?install=android or ?install=menu shows the
-  // card on any device, to preview it.
+  // Chrome offers its own install prompt through an event. Safari on iOS has none, so there the invitation says how (Share,
+  // then Add to Home Screen). ?install=ios or ?install=android shows the invitation on any device, to preview it.
   const installBtn = $('installBtn'), sheet = $('install');
   const SHARE = '<svg class="share" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3M8 7l4-4 4 4M7 10H6a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9a1 1 0 0 0-1-1h-1"/></svg>';
   const pretend = new URLSearchParams(location.search).get('install');        // 'ios', 'android' or nothing
@@ -500,11 +498,10 @@
   const quiet = () => { try { return !pretend && Date.now() - Number(localStorage.getItem(ASKED)) < QUIET_DAYS * 864e5; } catch (e) { return false; } };
   const hush = () => { try { if (!pretend) localStorage.setItem(ASKED, Date.now()); } catch (e) { /* it will ask again next visit */ } };
 
-  const offerable = () => IOS || offered || pretend === 'menu';              // a phone is only asked when there is something to do
-  function updateInstall() { installBtn.hidden = installed(); }
+  function updateInstall() { installBtn.hidden = installed() || !(IOS || offered); }
   function renderInstall() {                                                  // the words of the invitation, in the current language
     const how = shown === 'steps';                                            // no prompt to give: say how to do it by hand
-    $('installText').innerHTML = how ? L.h(IOS ? 'install.ios' : 'install.menu', { share: raw(SHARE) }) : L.h('install.text');
+    $('installText').innerHTML = how ? L.h('install.ios', { share: raw(SHARE) }) : L.h('install.text');
     $('installYes').hidden = how;
     set('installLater', L.t(how ? 'install.ok' : 'install.later'));
   }
@@ -524,17 +521,17 @@
     if (reduceMotion()) done(); else setTimeout(done, 480);
   }
   function invite() {                                                         // on a phone that can install: ask once the page has settled
-    if (inviteTimer || shown || installed() || !phone() || !offerable() || quiet()) return;
+    if (inviteTimer || shown || installed() || !phone() || !(IOS || offered) || quiet()) return;
     const attempt = () => {
       inviteTimer = null;
-      if (shown || installed() || !offerable()) return;
+      if (shown || installed() || !(IOS || offered)) return;
       if (settingsDlg.open || helpDlg.open) { inviteTimer = setTimeout(attempt, 2000); return; }      // not on top of a panel
       openInvite(offered ? 'prompt' : 'steps');
     };
     inviteTimer = setTimeout(attempt, pretend ? 600 : 3500);
   }
   async function install() {                                                  // the button by the settings, and "Install" in the invitation
-    if (!offered) { openInvite('steps'); return; }                            // nothing to prompt with: say how to do it by hand
+    if (!offered) { if (IOS) openInvite('steps'); return; }
     const prompt = offered;
     offered = null;
     updateInstall();

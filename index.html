@@ -216,7 +216,7 @@
   .info .where { color: var(--muted); font-size: .85rem; }
 
   /* the illustrations in the "?" panel: thin line drawings in the page's colours (see illBegins, illEnds, illPeriod) */
-  .ill { display: block; width: 100%; height: auto; margin: .6rem 0 .2rem; overflow: visible; }
+  .ill { display: block; width: 100%; height: auto; margin: .7rem 0 .3rem; overflow: visible; }
   .ill * { stroke-linecap: round; stroke-linejoin: round; }
   .il-line { stroke: var(--muted); fill: none; stroke-width: 1.5; }
   .il-faint { stroke: var(--line); fill: none; stroke-width: 1.5; }
@@ -226,11 +226,14 @@
   .il-dot { fill: var(--fg); }
   .il-mute { fill: var(--muted); }
   .il-band { fill: var(--none-bg); }
-  .il-red { fill: var(--no-bg); stroke: var(--no-ink); stroke-width: 1.5; }
+  .il-in { fill: var(--no-bg); stroke: var(--no-ink); stroke-width: 1.5; }        /* the period bar, in the colours of the tag */
+  .il-out { fill: var(--yes-bg); stroke: var(--yes-ink); stroke-width: 1.5; }
+  .il-none { fill: var(--none-bg); stroke: var(--muted); stroke-width: 1.5; }
+  .il-gap { stroke: var(--bg); stroke-width: 2.5; }
   .il-t { fill: var(--muted); font-size: 11px; }
   .il-n { fill: var(--fg); font-size: 12px; font-weight: 600; }
-  /* their animation, played once when first scrolled into view (playDrawings): each moving part waits on its first frame,
-     runs when the drawing gets "play", and keeps its last frame, which is the drawing itself */
+  /* their animation, played each time the panel opens, once a drawing is well in view (playDrawings): each moving part
+     waits on its first frame, runs when the drawing gets "play", and keeps its last frame, which is the drawing itself */
   .ill [class^="ani-"] { animation: .6s cubic-bezier(.3, .7, .2, 1) both paused; }
   .ill .ani-fade { animation-name: il-fade; }
   .ill .ani-sink { animation-name: il-sink; animation-duration: 1.3s; animation-timing-function: cubic-bezier(.45, .05, .3, 1); }
@@ -436,133 +439,153 @@
 
   // ---- the "?" panel: how the times are worked out -------------------------------------------------
   // ---- the drawings in the "?" panel -----------------------------------------------------------------
-  // Thin line drawings in the page's own colours (the il-* classes in the CSS), 320 units wide, made from the live numbers.
-  // In Hebrew the scene is mirrored (time runs right to left) but the words are not: X() mirrors positions.
-  // Each one plays a short animation the first time it is scrolled into view and then stays as drawn (playDrawings): the
-  // moving parts sit in groups with an ani-* class and a delay, held on their first frame until the drawing gets "play".
-  function drawing(name, h, aria, body) {
-    return '<svg class="ill" data-name="' + name + '" viewBox="0 0 320 ' + h + '" role="img" aria-label="' + I18N.esc(aria) + '">' + body + '</svg>';
+  // Thin line drawings in the page's own colours (the il-* classes in the CSS), made from the live numbers. Each is exactly
+  // as wide as the panel's text (w units = w CSS pixels), so its edges line up with the paragraphs and its labels are the
+  // panel's small text size on any screen. In Hebrew the scene is mirrored (time runs right to left) but the words are not:
+  // X() mirrors positions. Each plays a short animation when it comes well into view (playDrawings): the moving parts sit
+  // in groups with an ani-* class and a delay, held on their first frame until the drawing gets "play".
+  function drawing(name, w, h, aria, body) {
+    return '<svg class="ill" data-name="' + name + '" viewBox="0 0 ' + w + ' ' + Math.ceil(h) + '" role="img" aria-label="' + I18N.esc(aria) + '">' + body + '</svg>';
   }
-  function pen(rtl) {
-    const X = x => rtl ? 320 - x : x;                 // with direction="rtl", text-anchor start/end already mirror
-    const text = (cls, x, y, s, anchor) => '<text class="' + cls + '" x="' + X(x).toFixed(1) + '" y="' + y + '" text-anchor="' + (anchor || 'start') + '"' +
+  function pen(rtl, w) {
+    const X = x => rtl ? w - x : x;                 // with direction="rtl", text-anchor start/end already mirror
+    const n = v => (+v).toFixed(1);
+    const text = (cls, x, y, s, anchor) => '<text class="' + cls + '" x="' + n(X(x)) + '" y="' + n(y) + '" text-anchor="' + (anchor || 'start') + '"' +
       (rtl ? ' direction="rtl"' : '') + '>' + I18N.esc(s) + '</text>';
-    const line = (cls, x1, y1, x2, y2, extra) => '<line class="' + cls + '" x1="' + X(x1).toFixed(1) + '" y1="' + y1 + '" x2="' + X(x2).toFixed(1) + '" y2="' + y2 + '"' + (extra || '') + '/>';
-    const dot = (cls, x, y, r) => '<circle class="' + cls + '" cx="' + X(x).toFixed(1) + '" cy="' + y + '" r="' + r + '"/>';
-    const star = (x, y, r) => {                         // a four-point sparkle
-      const c = X(x), k = r * 0.28;
-      return '<path class="il-dot" d="M' + c + ' ' + (y - r) + 'Q' + (c + k) + ' ' + (y - k) + ' ' + (c + r) + ' ' + y + 'Q' + (c + k) + ' ' + (y + k) + ' ' + c + ' ' + (y + r) +
-        'Q' + (c - k) + ' ' + (y + k) + ' ' + (c - r) + ' ' + y + 'Q' + (c - k) + ' ' + (y - k) + ' ' + c + ' ' + (y - r) + 'Z"/>';
+    // a centred label kept inside the drawing (about 0.56 em a character)
+    const fit = (x, s, size) => { const half = String(s).length * size * 0.28 + 1; return Math.min(w - half, Math.max(half, x)); };
+    const line = (cls, x1, y1, x2, y2, extra) => '<line class="' + cls + '" x1="' + n(X(x1)) + '" y1="' + n(y1) + '" x2="' + n(X(x2)) + '" y2="' + n(y2) + '"' + (extra || '') + '/>';
+    const dot = (cls, x, y, r) => '<circle class="' + cls + '" cx="' + n(X(x)) + '" cy="' + n(y) + '" r="' + r + '"/>';
+    const star = (x, y, r) => {                       // a four-point sparkle
+      const c = X(x), k = r * 0.28, f = v => n(v);
+      return '<path class="il-dot" d="M' + f(c) + ' ' + f(y - r) + 'Q' + f(c + k) + ' ' + f(y - k) + ' ' + f(c + r) + ' ' + f(y) + 'Q' + f(c + k) + ' ' + f(y + k) + ' ' + f(c) + ' ' + f(y + r) +
+        'Q' + f(c - k) + ' ' + f(y + k) + ' ' + f(c - r) + ' ' + f(y) + 'Q' + f(c - k) + ' ' + f(y - k) + ' ' + f(c) + ' ' + f(y - r) + 'Z"/>';
     };
-    const candle = (x, y) =>                            // a small candle: body with its foot at (x, y), and a flame
-      '<rect class="il-ink" x="' + (X(x) - 2.5).toFixed(1) + '" y="' + (y - 11) + '" width="5" height="11" rx="1"/>' +
-      '<path class="il-sun" d="M' + X(x) + ' ' + (y - 20) + 'q3.2 4.2 0 6.6q-3.2 -2.4 0 -6.6z"/>';
-    const ani = (kind, delay, body, style) =>           // a moving part: fade, sink, turn, grow, pop or drop, starting after delay seconds
+    const candle = (x, y) =>                          // a small candle: body with its foot at (x, y), and a flame
+      '<rect class="il-ink" x="' + n(X(x) - 2.5) + '" y="' + n(y - 11) + '" width="5" height="11" rx="1"/>' +
+      '<path class="il-sun" d="M' + n(X(x)) + ' ' + n(y - 20) + 'q3.2 4.2 0 6.6q-3.2 -2.4 0 -6.6z"/>';
+    const ani = (kind, delay, body, style) =>         // a moving part: fade, sink, turn, grow, pop or drop, starting after delay seconds
       '<g class="ani-' + kind + (kind === 'grow' && rtl ? ' from-end' : '') + '" style="animation-delay:' + (delay + 0.25).toFixed(2) + 's' +
       (style ? ';' + style : '') + '">' + body + '</g>';
-    return { X, text, line, dot, star, candle, ani };
+    return { X, n, text, fit, line, dot, star, candle, ani };
   }
 
-  // The earth under the observer: a curved arc, clipped to the scene (the horizon is the dashed tangent).
-  function earth(p, id, ox, crest, R, bottom) {
-    return '<defs><clipPath id="' + id + '"><rect x="0" y="-20" width="320" height="' + (bottom + 20) + '"/></clipPath></defs>' +
-      '<g clip-path="url(#' + id + ')"><circle class="il-line" cx="' + p.X(ox) + '" cy="' + (crest + R) + '" r="' + R + '"/></g>';
+  // The earth under the observer: a curved arc (the horizon is the dashed tangent), fading out towards the drawing's sides
+  // and bottom, so it never runs off the drawing or stops with a hard cut.
+  function earth(p, w, id, ox, crest, R, bottom) {
+    const box = 'x="0" y="-20" width="' + w + '" height="' + (bottom + 20) + '"';
+    const stop = (at, on) => '<stop offset="' + at + '" stop-color="#fff"' + (on ? '' : ' stop-opacity="0"') + '/>';
+    const ends = Math.min(0.12, 40 / w);              // the fade at each side: 40 units, or less on a narrow drawing
+    return '<defs>' +
+      '<linearGradient id="' + id + 'X">' + stop(0) + stop(ends, 1) + stop(1 - ends, 1) + stop(1) + '</linearGradient>' +
+      '<linearGradient id="' + id + 'Y" x2="0" y2="1">' + stop(0.62, 1) + stop(0.98) + '</linearGradient>' +
+      '<mask id="' + id + 'MX" maskUnits="userSpaceOnUse" ' + box + '><rect ' + box + ' fill="url(#' + id + 'X)"/></mask>' +
+      '<mask id="' + id + 'MY" maskUnits="userSpaceOnUse" ' + box + '><rect ' + box + ' fill="url(#' + id + 'Y)"/></mask></defs>' +
+      '<g mask="url(#' + id + 'MX)"><g mask="url(#' + id + 'MY)"><circle class="il-line" cx="' + p.n(p.X(ox)) + '" cy="' + (crest + R) + '" r="' + R + '"/></g></g>';
   }
 
   // When it begins: the observer stands on the curved earth, on a post as high as the place; the horizon is the dashed line
-  // from the eye that touches the earth, and the sun goes down until its top edge meets it. Candle lighting was the given
-  // minutes before.
+  // from the eye that touches the earth, and the sun goes down until its top edge meets it. Below, a time axis as wide as the
+  // text: candle lighting under the observer, then sunset under the sun, the given minutes apart.
   function illBegins(o) {
-    const p = pen(o.rtl), R = 200, ox = 70, crest = 30, up = o.height ? 14 : 0, bottom = crest + 86, r = 11;
+    const w = o.w, p = pen(o.rtl, w), R = 200, ox = 56, crest = 30, up = o.height ? 14 : 0, bottom = crest + 86, r = 11;
     const ey = crest - up;                               // the eye
     let dx = 1, dy = 0;                                  // the horizon's direction: level at sea level, dipping from a height
     if (up) {
       const th = Math.acos(R / (R + up)), tx = ox + R * Math.sin(th), ty = crest + R - R * Math.cos(th), len = Math.hypot(tx - ox, ty - ey);
       dx = (tx - ox) / len; dy = (ty - ey) / len;
     }
-    const k = (304 - ox) / dx, along = 184 / dx;         // to the far edge; and where the sun meets it
-    const px = ox + along * dx, py = ey + along * dy, sx = px - r * dy, sy = py + r * dx;   // the sun's top edge on the line
-    let s = earth(p, 'illBeginsEarth', ox, crest, R, bottom);
-    s += p.line('il-line', ox, ey, ox + k * dx, (ey + k * dy).toFixed(1), ' stroke-dasharray="4 4"');
-    s += p.ani('sink', 0, p.dot('il-sun', sx, sy.toFixed(1), r));
-    if (up) { s += p.line('il-ink', ox, crest, ox, ey + 3); s += p.text('il-t', ox - 8, crest - 3, o.height, 'end'); }
+    const target = Math.min(w - 66, ox + 200);           // the sun's place: near the far side, not too far down the line
+    const along = (target + r * dy - ox) / dx;
+    const sx = ox + along * dx - r * dy, sy = ey + along * dy + r * dx;   // its top edge on the line
+    let s = earth(p, w, 'illBeginsEarth', ox, crest, R, bottom);
+    const lx = Math.min(w, sx + 70);                    // the line stops a little past the sun, inside the drawing
+    s += p.line('il-line', ox, ey, lx, ey + (lx - ox) / dx * dy, ' stroke-dasharray="4 4"');
+    s += p.ani('sink', 0, p.dot('il-sun', sx, sy, r));
+    if (up) { s += p.line('il-ink', ox, crest, ox, ey + 3); s += p.text('il-t', ox - 8, ey + 4, o.height, 'end'); }
     s += p.dot('il-dot', ox, ey, 3);
-    // the time axis: candle lighting, then sunset
-    const ax = bottom + 20, cx = 70, tx = Math.round(sx);
-    s += p.line('il-faint', 30, ax, 290, ax);
-    s += p.line('il-line', cx, ax - 5, cx, ax + 5) + p.line('il-line', tx, ax - 5, tx, ax + 5);
-    s += p.candle(cx, ax - 9);
-    s += p.ani('grow', 0.7, p.line('il-line', cx + 10, ax - 6, tx - 10, ax - 6, ' stroke-dasharray="1 4"'));
-    s += p.ani('fade', 1.3, p.text('il-t', (cx + tx) / 2, ax - 11, o.minLabel, 'middle'));
-    s += p.text('il-n', cx, ax + 17, o.candle, 'middle') + p.text('il-t', cx, ax + 29, o.candleLabel, 'middle');
-    s += p.text('il-n', tx, ax + 17, o.sunset, 'middle') + p.text('il-t', tx, ax + 29, o.sunsetLabel, 'middle');
-    return drawing('begins', ax + 34, o.aria, s);
+    // the time axis
+    const ax = bottom + 20, tx = sx;
+    s += p.line('il-faint', 0, ax, w, ax);
+    s += p.line('il-line', ox, ax - 5, ox, ax + 5) + p.line('il-line', tx, ax - 5, tx, ax + 5);
+    s += p.candle(ox, ax - 9);
+    s += p.ani('grow', 0.7, p.line('il-line', ox + 10, ax - 6, tx - 10, ax - 6, ' stroke-dasharray="1 4"'));
+    s += p.ani('fade', 1.3, p.text('il-t', (ox + tx) / 2, ax - 11, o.minLabel, 'middle'));
+    s += p.text('il-n', p.fit(ox, o.candle, 12), ax + 18, o.candle, 'middle') + p.text('il-t', p.fit(ox, o.candleLabel, 11), ax + 31, o.candleLabel, 'middle');
+    s += p.text('il-n', p.fit(tx, o.sunset, 12), ax + 18, o.sunset, 'middle') + p.text('il-t', p.fit(tx, o.sunsetLabel, 11), ax + 31, o.sunsetLabel, 'middle');
+    return drawing('begins', w, ax + 36, o.aria, s);
   }
 
   // When it ends: the observer on the curved earth, the level horizon as a dashed tangent, and the sun swinging down below
-  // it to the set angle (drawn twice as steep, so it can be seen); then three stars come out.
+  // it to the set angle (drawn twice as steep, so it can be seen); the three stars come out as it goes down.
   function illEnds(o) {
-    const p = pen(o.rtl), H = 132, hor = 66, ox = 64, r = 9, R = 200;
-    const deg = Math.min(30, Math.max(10, o.deg * 2)), a = deg * Math.PI / 180, dist = 172;
-    const sx = ox + dist * Math.cos(a), sy = hor + dist * Math.sin(a);
+    const w = o.w, p = pen(o.rtl, w), hor = 66, ox = 56, r = 9, R = 200;
+    const deg = Math.min(30, Math.max(10, o.deg * 2)), a = deg * Math.PI / 180;
+    const sx = Math.min(w - 100, ox + 176), dist = (sx - ox) / Math.cos(a), sy = hor + dist * Math.sin(a);
     const ar = 84, ex = ox + ar * Math.cos(a), ey = hor + ar * Math.sin(a);
-    const arc = 'A' + ar + ' ' + ar + ' 0 0 ' + (o.rtl ? 0 : 1) + ' ' + p.X(ex).toFixed(1) + ' ' + ey.toFixed(1);
-    let s = earth(p, 'illEndsEarth', ox, hor, R, H);
-    s += p.ani('fade', 1.0, '<path class="il-band" d="M' + p.X(ox) + ' ' + hor + 'L' + p.X(ox + ar) + ' ' + hor + arc + 'Z"/>');   // the angle, filled softly
-    s += p.ani('pop', 1.35, p.star(206, 22, 6)) + p.ani('pop', 1.6, p.star(246, 40, 4)) + p.ani('pop', 1.85, p.star(276, 18, 4.8));
-    s += p.line('il-line', ox, hor, 304, hor, ' stroke-dasharray="4 4"');
+    const arc = 'A' + ar + ' ' + ar + ' 0 0 ' + (o.rtl ? 0 : 1) + ' ' + p.n(p.X(ex)) + ' ' + p.n(ey);
+    let s = p.ani('fade', 1.0, '<path class="il-band" d="M' + p.n(p.X(ox)) + ' ' + hor + 'L' + p.n(p.X(ox + ar)) + ' ' + hor + arc + 'Z"/>');   // the angle, filled softly
+    s += earth(p, w, 'illEndsEarth', ox, hor, R, sy + r + 10);    // over the shaded angle, so the earth stays whole
+    const st = Math.min(sx - 8, w - 76);               // the stars in the sky above the sun, one by one as it goes down
+    s += p.ani('pop', 0.55, p.star(st, 22, 6)) + p.ani('pop', 0.95, p.star(st + 40, 40, 4)) + p.ani('pop', 1.35, p.star(st + 70, 18, 4.8));
+    s += p.line('il-line', ox, hor, w, hor, ' stroke-dasharray="4 4"');
     s += p.ani('turn', 0,                                             // the ray and the sun turn down about the observer
-      p.line('il-faint', ox, hor, sx - r * Math.cos(a), sy - r * Math.sin(a), ' stroke-dasharray="3 4"') + p.dot('il-sun', sx, sy.toFixed(1), r),
-      '--from:' + (o.rtl ? deg : -deg) + 'deg;transform-origin:' + p.X(ox) + 'px ' + hor + 'px');
-    s += p.ani('fade', 1.0, '<path class="il-ink" stroke-width="1.5" d="M' + p.X(ox + ar) + ' ' + hor + arc + '"/>');
-    s += p.ani('fade', 1.2, p.text('il-n', ox + ar + 8, (hor + ar * Math.sin(a / 2) + 6).toFixed(1), o.degLabel));
+      p.line('il-faint', ox, hor, sx - r * Math.cos(a), sy - r * Math.sin(a), ' stroke-dasharray="3 4"') + p.dot('il-sun', sx, sy, r),
+      '--from:' + (o.rtl ? deg : -deg) + 'deg;transform-origin:' + p.n(p.X(ox)) + 'px ' + hor + 'px');
+    s += p.ani('fade', 1.0, '<path class="il-ink" stroke-width="1.5" d="M' + p.n(p.X(ox + ar)) + ' ' + hor + arc + '"/>');
+    s += p.ani('fade', 1.2, p.text('il-n', ox + ar + 8, hor + ar * Math.sin(a / 2) + 6, o.degLabel));
     s += p.dot('il-dot', ox, hor - 3, 3);
-    s += p.ani('fade', 1.2, p.text('il-t', sx + r + 6, (sy + 4).toFixed(1), o.nightfall));
-    s += p.text('il-t', 16, 22, o.endLabel) + p.text('il-n', 16, 38, o.end);
-    return drawing('ends', H, o.aria, s);
+    s += p.ani('fade', 1.2, p.text('il-t', sx + r + 6, sy + 4, o.nightfall));
+    s += p.text('il-t', 0, 22, o.endLabel) + p.text('il-n', 0, 38, o.end);
+    return drawing('ends', w, sy + r + 10, o.aria, s);
   }
 
-  // The one on the page: a bar that grows from candle lighting to the end, its Shabbat and holiday runs, the days, and now.
+  // The one on the page: a bar as wide as the text that grows from candle lighting to the end, in the colours of the answer's
+  // tag (on, out, next), cut where Shabbat and a holiday meet; the days under it, and where now is.
   function illPeriod(o) {
-    const p = pen(o.rtl), H = 104, x0 = 24, x1 = 296, y = 52, bh = 10, span = o.end - o.start;
+    const w = o.w, p = pen(o.rtl, w), H = 104, x0 = 0, x1 = w, y = 52, bh = 10, span = o.end - o.start;
     const at = ms => x0 + (x1 - x0) * (ms - o.start) / span;
-    let s = '<defs><clipPath id="illPeriodBar"><rect x="' + x0 + '" y="' + (y - bh / 2) + '" width="' + (x1 - x0) + '" height="' + bh + '" rx="' + bh / 2 + '"/></clipPath></defs>';
-    let bar = '<g clip-path="url(#illPeriodBar)">';
-    o.segments.forEach((g, i) => {
-      const a = at(g.start), b = at(g.end), left = Math.min(p.X(a), p.X(b));
-      bar += '<rect class="' + (i % 2 ? 'il-band' : 'il-red') + '" x="' + left.toFixed(1) + '" y="' + (y - bh / 2) + '" width="' + Math.abs(b - a).toFixed(1) + '" height="' + bh + '"/>';
-    });
-    s += p.ani('grow', 0, bar + '</g>');
+    let bar = '<defs><clipPath id="illPeriodBar"><rect x="' + x0 + '" y="' + (y - bh / 2) + '" width="' + (x1 - x0) + '" height="' + bh + '" rx="' + bh / 2 + '"/></clipPath></defs>' +
+      '<g clip-path="url(#illPeriodBar)"><rect class="il-' + o.state + '" x="' + x0 + '" y="' + (y - bh / 2) + '" width="' + (x1 - x0) + '" height="' + bh + '" rx="' + bh / 2 + '"/>';
+    o.segments.slice(1).forEach(g => { bar += p.line('il-gap', at(g.start), y - bh, at(g.start), y + bh); });
+    let s = p.ani('grow', 0, bar + '</g>');
     let names = '', days = '';
-    o.segments.forEach((g, i) => { names += p.text('il-t', (at(g.start) + at(g.end)) / 2, y - 12 - (o.segments.length > 2 && i % 2 ? 12 : 0), g.name, 'middle'); });
-    o.days.forEach(d => { const x = at(d.at); days += p.line('il-faint', x, y - 9, x, y + 9) + p.text('il-t', x, y + 22, d.label, 'middle'); });
+    o.segments.forEach((g, i) => {
+      const yy = y - 12 - (o.segments.length > 2 && i % 2 ? 12 : 0);
+      names += p.text('il-t', p.fit((at(g.start) + at(g.end)) / 2, g.name, 11), yy, g.name, 'middle');
+    });
+    o.days.forEach(d => { const x = at(d.at); days += p.line('il-faint', x, y - 9, x, y + 9) + p.text('il-t', p.fit(x, d.label, 11), y + 22, d.label, 'middle'); });
     s += p.ani('fade', 0.7, days) + p.ani('fade', 0.8, names);
     s += p.candle(x0 + 3, y - 10 - 18);
-    s += p.ani('pop', 1.05, p.star(x1 - 3, y - 26, 4));
+    s += p.ani('pop', 1.05, p.star(x1 - 4, y - 26, 4));
     s += p.text('il-n', x0, y + 40, o.startText, 'start') + p.ani('fade', 0.9, p.text('il-n', x1, y + 40, o.endText, 'end'));
     if (o.now >= o.start - 6 * 3600e3 && o.now <= o.end + 6 * 3600e3) {
-      const x = Math.min(x1 + 10, Math.max(x0 - 10, at(o.now)));
+      const x = Math.min(x1 - 1.5, Math.max(x0 + 1.5, at(o.now)));
       s += p.ani('drop', 1.15, p.line('il-ink', x, y - 9, x, y + 9) + p.dot('il-dot', x, y, 3) +
-        (x > x0 + 30 && x < x1 - 30 ? p.text('il-t', x, y - 28, o.nowLabel, 'middle') : ''));
+        (x > x0 + 34 && x < x1 - 34 ? p.text('il-t', p.fit(x, o.nowLabel, 11), y - 28, o.nowLabel, 'middle') : ''));
     }
-    return drawing('period', H, o.aria, s);
+    return drawing('period', w, H, o.aria, s);
   }
 
-  // Plays each drawing's animation once, the first time it is at least half in view; after that (and when reopened) it is
-  // simply drawn. With reduced motion, or no IntersectionObserver, the drawings are just drawn.
-  const played = new Set();
-  let watcher = null;
+  // Plays each drawing's animation when it is well in view: 85% of it between the panel's title and the bottom tenth of
+  // the panel, checked when the panel opens and as it scrolls. It plays again from the start every time the panel is
+  // opened (renderInfo draws them afresh); with reduced motion the drawings are simply drawn.
+  let waiting = [];
+  function checkDrawings() {
+    if (!waiting.length || !helpDlg.open) return;
+    const box = helpDlg.getBoundingClientRect();
+    const top = box.top + helpDlg.querySelector('.head').offsetHeight, bottom = box.bottom - box.height * 0.1;
+    waiting = waiting.filter(svg => {
+      const r = svg.getBoundingClientRect(), seen = Math.min(r.bottom, bottom) - Math.max(r.top, top);
+      if (r.height > 0 && seen >= r.height * 0.85) { svg.classList.add('play'); return false; }
+      return true;
+    });
+  }
   function playDrawings() {
-    if (watcher) watcher.disconnect();
     const all = [...$('helpBody').querySelectorAll('svg.ill')];
-    const fresh = all.filter(svg => !played.has(svg.dataset.name));
-    all.filter(svg => played.has(svg.dataset.name)).forEach(svg => svg.classList.add('done'));
-    const play = svg => { svg.classList.add('play'); played.add(svg.dataset.name); };
-    if (reduceMotion() || !('IntersectionObserver' in window)) { fresh.forEach(svg => { svg.classList.add('done'); played.add(svg.dataset.name); }); return; }
-    watcher = new IntersectionObserver(entries => {
-      for (const e of entries) if (e.isIntersecting) { play(e.target); watcher.unobserve(e.target); }
-    }, { threshold: 0.5 });
-    fresh.forEach(svg => watcher.observe(svg));
+    if (reduceMotion()) { all.forEach(svg => svg.classList.add('done')); waiting = []; return; }
+    waiting = all;
+    checkDrawings();
   }
 
   // The local midnights inside a period, for the day ticks on its timeline.
@@ -585,6 +608,7 @@
     const weekday = new Intl.DateTimeFormat(L.locale, { weekday: 'short', timeZone: P.tz });
     const at = ms => weekday.format(ms) + ' ' + f.time(ms);
     const segments = (p.segments && p.segments.length ? p.segments : [p]).map(s => ({ name: s.items.map(L.itemName).join(' + '), start: s.start, end: s.end }));
+    const w = Math.round(Math.max(240, $('helpBody').clientWidth - 40));          // the width of the panel's text (it is open by now)
 
     $('helpBody').innerHTML =
       '<p>' + h('help.intro') + '</p>' +
@@ -596,7 +620,7 @@
 
       '<h3>' + h('help.begins.h') + '</h3>' +
       illBegins({
-        rtl, aria: L.t('ill.begins.aria', { n: total }), sunset: f.seconds(sunsetMs), candle: f.time(p.start), minutes: total,
+        w, rtl, aria: L.t('ill.begins.aria', { n: total }), sunset: f.seconds(sunsetMs), candle: f.time(p.start), minutes: total,
         minLabel: L.t('ill.min', { n: total }), height: up ? L.t('ill.height', { m: P.elevation }) : '',
         sunsetLabel: L.t('ill.sunset'), candleLabel: L.t('ill.candle')
       }) +
@@ -608,14 +632,14 @@
 
       '<h3>' + h('help.ends.h') + '</h3>' +
       (byMinutes ? '' : illEnds({
-        rtl, aria: L.t('ill.ends.aria', { deg: P.havdalahDegrees }), deg: P.havdalahDegrees, degLabel: P.havdalahDegrees + '°',
+        w, rtl, aria: L.t('ill.ends.aria', { deg: P.havdalahDegrees }), deg: P.havdalahDegrees, degLabel: P.havdalahDegrees + '°',
         nightfall: f.seconds(nightMs), end: f.time(p.end), endLabel: L.t('ill.end')
       })) +
       '<p>' + ends + '</p>' +
 
       '<h3>' + h('help.numbers.h') + '</h3>' +
       illPeriod({
-        rtl, aria: L.t('ill.period.aria'), start: p.start, end: p.end, now, segments,
+        w, rtl, state: st.state, aria: L.t('ill.period.aria'), start: p.start, end: p.end, now, segments,
         startText: at(p.start), endText: at(p.end), nowLabel: L.t('ill.now'),
         days: midnights(p.start, p.end, P.tz).map(ms => ({ at: ms, label: weekday.format(ms) }))
       }) +
@@ -760,7 +784,9 @@
     render();
   }
   $('gear').addEventListener('click', () => openPanel(settingsDlg, showSettings));
-  $('helpBtn').addEventListener('click', () => { openPanel(helpDlg, renderInfo); playDrawings(); });
+  $('helpBtn').addEventListener('click', () => { openPanel(helpDlg, () => {}); renderInfo(); playDrawings(); });   // drawn once open: they take the panel's width
+  helpDlg.addEventListener('scroll', checkDrawings, { passive: true });
+  addEventListener('resize', checkDrawings);
   let swapTimer = null, swapChange = null;
   function withFade(change) {                          // fade the words out, run `change` (it swaps them), fade back in
     if (reduceMotion()) { change(); return; }

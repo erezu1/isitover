@@ -13,7 +13,7 @@ let failed = 0;
 const report = (ok, msg) => { console.log((ok ? '  ok  ' : ' FAIL ') + msg); if (!ok) failed++; };
 const he = I18N.LANGS.he.strings, en = I18N.LANGS.en.strings;
 const placeholders = s => [...String(s).matchAll(/\{(\w+)\}/g)].map(m => m[1]).sort().join(',');
-const tags = s => [...String(s).matchAll(/<\/?(\w+)/g)].map(m => m[1]).sort().join(',');
+const tags = s => [...new Set([...String(s).matchAll(/<\/?(\w+)/g)].map(m => m[1]))].sort().join(',');   // which tags, not how many
 
 // 1. The same keys, the same {placeholders} and the same <b>/<a> tags in both languages.
 {
@@ -29,9 +29,9 @@ const tags = s => [...String(s).matchAll(/<\/?(\w+)/g)].map(m => m[1]).sort().jo
 // 2. Every key the page uses exists in both languages (data-i18n attributes, and L.t / L.h calls with a literal key).
 {
   const used = new Set();
-  for (const m of html.matchAll(/data-i18n="([\w.]+)"/g)) used.add(m[1]);
-  for (const m of html.matchAll(/data-i18n-attr="([^"]+)"/g)) for (const pair of m[1].split(',')) used.add(pair.split(':')[1].trim());
-  for (const m of html.matchAll(/\bL\.[th]\(\s*'([\w.]+)'/g)) used.add(m[1]);
+  for (const m of html.matchAll(/<[a-z][^>]*\sdata-i18n="([\w.]+)"/g)) used.add(m[1]);                  // in tags only, not in comments
+  for (const m of html.matchAll(/<[a-z][^>]*\sdata-i18n-attr="([^"]+)"/g)) for (const pair of m[1].split(',')) used.add(pair.split(':')[1].trim());
+  for (const m of html.matchAll(/\bL\.[th]\(\s*'([\w.]+)'\s*[,)]/g)) used.add(m[1]);                  // a whole literal key, not a prefix
   const missing = [...used].filter(k => !(k in he) || !(k in en));
   report(used.size > 0 && !missing.length, `${used.size} keys used in index.html all exist in both languages` + (missing.length ? `  (missing: ${missing})` : ''));
   // keys built from parts in the page: title.<kind>, answer.<state>, tag.<state>.<kind>, help.height.*, ...
@@ -47,7 +47,8 @@ const tags = s => [...String(s).matchAll(/<\/?(\w+)/g)].map(m => m[1]).sort().jo
 // 3. The help text: every help.* key is used by renderInfo in index.html.
 {
   const helpKeys = Object.keys(en).filter(k => k.startsWith('help.'));
-  const unused = helpKeys.filter(k => !html.includes("'" + k + "'"));
+  const referenced = k => new RegExp('[\'":,]' + k.replace(/\./g, '\\.') + '[\'",]').test(html);      // 'key', data-i18n="key", attr:key
+  const unused = helpKeys.filter(k => !referenced(k));
   report(!unused.length, `all ${helpKeys.length} help.* keys are used by the "?" panel` + (unused.length ? `  (unused: ${unused})` : ''));
 }
 
@@ -88,20 +89,21 @@ const tags = s => [...String(s).matchAll(/<\/?(\w+)/g)].map(m => m[1]).sort().jo
 {
   const f = I18N.create('he').format('Asia/Jerusalem'), e = I18N.create('en').format('Asia/Jerusalem');
   const m = n => n * 60000;
-  const he = [[0.2, 'פחות מדקה'], [1, 'דקה'], [2, 'שתי דקות'], [30, '30 דקות'], [60, 'שעה'], [61, 'שעה ודקה'], [62, 'שעה ושתי דקות'], [72, 'שעה ו־12 דקות'],
-    [120, 'שעתיים'], [150, 'שעתיים ו־30 דקות'], [180, '3 שעות'], [48 * 60, 'יומיים'], [5 * 24 * 60, '5 ימים']];
+  const he = [[0.2, 'פחות מדקה'], [1, 'דקה'], [2, 'שתי דקות'], [30, '30 דקות'], [60, 'שעה'], [61, 'שעה ודקה'], [62, 'שעה ושתי דקות'], [72, 'שעה ו-12 דקות'],
+    [77, 'שעה ו-17 דקות'], [120, 'שעתיים'], [150, 'שעתיים ו-30 דקות'], [180, '3 שעות'], [48 * 60, 'יומיים'], [5 * 24 * 60, '5 ימים']];
   const bad = he.filter(([n, want]) => f.span(m(n)) !== want);
   report(!bad.length, 'Hebrew durations' + (bad.length ? '  ' + bad.map(([n, w]) => `${n} min: ${f.span(m(n))} != ${w}`).join(' | ') : ''));
   const en2 = [[0.2, 'less than a minute'], [30, '30 min'], [72, '1 h 12 min'], [120, '2 h'], [5 * 24 * 60, '5 days']];
   const bad2 = en2.filter(([n, want]) => e.span(m(n)) !== want);
   report(!bad2.length, 'English durations' + (bad2.length ? '  ' + bad2.map(([n, w]) => `${n} min: ${e.span(m(n))} != ${w}`).join(' | ') : ''));
-  const S = Shabbat.create('tel-aviv'), noon = day => day * 86400000 + 12 * 3600000;   // an instant inside that Tel Aviv day
-  const today = S.civilDay(Date.parse('2026-10-03T19:00:00+03:00'));
-  const t = Date.parse('2026-10-03T19:00:00+03:00');
-  const cases = [[f.when(t, today, S.civilDay), 'היום ב־19:00'], [f.when(t + 86400000, today, S.civilDay), 'מחר ב־19:00'], [f.when(t - 86400000, today, S.civilDay), 'אתמול ב־19:00'],
-    [f.when(t + 7 * 86400000, today, S.civilDay), 'בשבת, 10 באוק׳ ב־19:00'.replace('10 באוק׳', '10 באוק׳')], [e.when(t, today, S.civilDay), 'today 19:00'], [e.when(t + 6 * 86400000, today, S.civilDay), 'Fri 9 Oct 19:00']];
-  // 3 Oct 2026 is a Saturday, so +7 days is Saturday 10 Oct and +6 days is Friday 9 Oct
-  cases[3][1] = 'בשבת, 10 באוק׳ ב־19:00';
+  const S = Shabbat.create('tel-aviv');
+  const t = Date.parse('2026-10-03T19:00:00+03:00'), today = S.civilDay(t), DAYMS = 86400000;
+  // 3 Oct 2026 is a Saturday, so +6 days is Friday 9 Oct and +7 days is Saturday 10 Oct
+  const cases = [
+    [f.when(t, today, S.civilDay), 'היום ב-19:00'], [f.when(t + DAYMS, today, S.civilDay), 'מחר ב-19:00'], [f.when(t - DAYMS, today, S.civilDay), 'אתמול ב-19:00'],
+    [f.when(t + 6 * DAYMS, today, S.civilDay), 'ביום ו׳, 9 באוק׳ ב-19:00'], [f.when(t + 7 * DAYMS, today, S.civilDay), 'בשבת, 10 באוק׳ ב-19:00'],
+    [e.when(t, today, S.civilDay), 'today 19:00'], [e.when(t + 6 * DAYMS, today, S.civilDay), 'Fri 9 Oct 19:00'],
+  ];
   const bad3 = cases.filter(([got, want]) => got !== want);
   report(!bad3.length, 'Hebrew and English day words (today / tomorrow / yesterday / a weekday and date)' + (bad3.length ? '  ' + bad3.map(([g, w]) => `${g} != ${w}`).join(' | ') : ''));
 }

@@ -4,9 +4,19 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#faf8f4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#13120e" media="(prefers-color-scheme: dark)">
 <title>האם יצאה שבת?</title>
 <meta name="description" content="האם יצאה שבת? Is it over? Has Shabbat or the holiday ended? Worked out on your device, no network needed.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%95%AF%3C/text%3E%3C/svg%3E">
+<!-- the app: icons (see tools/icons.mjs), the manifest, and the home-screen settings iOS still reads from meta tags -->
+<link rel="icon" href="icons/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="יצאה שבת?">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <script>
   // The language and direction come from the cookie, before the first paint (Hebrew is the default).
   (function () {
@@ -102,9 +112,10 @@
   .sim[hidden] { display: none; }
 
   /* switching language: the words and buttons fade out, swap while invisible (the direction flips and the buttons
-     change corner), and fade back in */
-  .tools, main, dialog .pad { transition: opacity .26s ease; }
-  html.fading .tools, html.fading main, html.fading dialog .pad { opacity: 0; transition-duration: .18s; }
+     change corner), and fade back in, slower than they went out so the new words are seen arriving */
+  :root { --fade-out: .18s; --fade-in: .65s; }
+  .tools, main, dialog .pad { transition: opacity var(--fade-in) cubic-bezier(.4, 0, .2, 1); }
+  html.fading .tools, html.fading main, html.fading dialog .pad { opacity: 0; transition-duration: var(--fade-out); transition-timing-function: ease; }
   @media (prefers-reduced-motion: reduce) { .tools, main, dialog .pad { transition: none; } }
 
   /* the two panels fade in and out */
@@ -223,7 +234,7 @@
 </dialog>
 
 <script src="shabbat.js?v=101401f9"></script>
-<script src="i18n.js?v=612238bd"></script>
+<script src="i18n.js?v=f9393bc7"></script>
 <script>
 (function () {
   'use strict';
@@ -445,13 +456,14 @@
     if (swapTimer) return;
     const root = document.documentElement;
     root.classList.add('fading');
+    const out = parseFloat(getComputedStyle(root).getPropertyValue('--fade-out')) * 1000;      // the CSS has the timings
     swapTimer = setTimeout(() => {
       const run = swapChange;
       swapTimer = swapChange = null;
       run();
       void root.offsetWidth;                           // lay out the new words and direction while still invisible
       root.classList.remove('fading');
-    }, 200);
+    }, out + 20);
   }
   for (const r of document.querySelectorAll('input[name=lang]')) r.addEventListener('change', e => {
     const code = e.target.value;
@@ -484,6 +496,10 @@
     $('detail').textContent = (L ? L.t('error', { message: e.message }) : e.message);
   }
 })();
+</script>
+<script>
+  // Once opened with a network, the page opens without one (sw.js keeps it). Nothing else depends on this.
+  if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 </script>
 </body>
 </html>

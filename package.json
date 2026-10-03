@@ -4,7 +4,7 @@
   "private": true,
   "description": "Is it over? Has Shabbat (or the holiday) ended? Computed on the device, checked against hebcal.",
   "scripts": {
-    "test": "node test/verify.mjs && node test/i18n.mjs",
+    "test": "node test/verify.mjs && node test/i18n.mjs && node test/pwa.mjs",
     "stamp": "node tools/stamp.mjs"
   },
   "devDependencies": {

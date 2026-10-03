@@ -15,7 +15,9 @@ Holidays are the days on which work is forbidden: Rosh Hashana, Yom Kippur, Sukk
 Switching language fades the words and buttons out, flips the language and direction while they are invisible, and fades them back in. Two buttons at the top (the top right in English, the top left in Hebrew, since the whole layout mirrors), each opening a panel that fades in and out:
 
 - **?** explains how the times are worked out, with the numbers for the period on the page;
-- **gear** has the settings, kept in a cookie on the device: **language** (Hebrew by default), **place** (Tel Aviv by default; Petah Tikva, Jerusalem, Haifa, Be'er Sheva, Amsterdam, London, New York) and **holidays** (Israel, or Diaspora with second days).
+- **gear** has the settings, kept in a cookie on the device: **language** (Hebrew by default), **place** (Tel Aviv by default; Petah Tikva, Jerusalem, Haifa, Be'er Sheva, Amsterdam, London, New York) and **holidays** (Israel, or Diaspora with second days; in Hebrew **ארץ ישראל** or **גלויות**).
+
+**As an app.** The page installs (Chrome: Install; Safari on iOS: Share, then Add to Home Screen), opens on its own with its icon, a red no-sign with a black ש, and opens with no network once it has been opened with one. [`sw.js`](sw.js) keeps the page, its two scripts and its icons on the device. The page is asked for fresh every time, so an update arrives at once; if the network fails, answers with an error or takes more than 3 seconds, the kept copy is shown. A script is kept by its hash (`?v=`), so a kept copy is always the right one, and the old copy goes when a new hash arrives. The icons are drawn by [`tools/icons.mjs`](tools/icons.mjs) (`npm install --no-save @resvg/resvg-js`, then `node tools/icons.mjs`): a round one for the browser tab, a cream rounded one for "any", a full-bleed one for "maskable" with the sign inside the circle every launcher keeps, and the opaque 180 px one iOS wants. On iOS the home-screen app has its own cookies, so its settings are set there once.
 
 ## How the times are worked out
 
@@ -44,6 +46,7 @@ There is no single official source; the sites differ by up to a minute because t
 - **yeshiva.org.il**, Tel Aviv, Hebrew year 5787 (12 Sep 2026 to 25 Sep 2027, 60 Shabbat and holiday days), compared once by hand: the same end of Shabbat on **59 of 59** rows and the same candle lighting on 58 of 59. The rest are a minute off. The same table's Rabbeinu Tam column (`havdalahMinutes: 72` in the code, not offered on the page) matches on 58 of 59. The table is theirs, so it is not in this repo. One Jerusalem Shabbat checked too: end and Rabbeinu Tam the same, candle lighting a minute earlier than theirs.
 - **US Naval Observatory** (its sunrise and sunset API), 12 dates across the year: sunset and the 6°-below-horizon time within 29 seconds, which is their own whole-minute rounding.
 - **the text** (`npm test`, [`test/i18n.mjs`](test/i18n.mjs)): both languages have the same keys and `{placeholders}`, every key the page uses exists, the Hebrew verb forms, plurals and "ו-17 דקות" come out right, every place and holiday has a Hebrew name, and the titles and answers only use letters the embedded display fonts contain.
+- **the app** (`npm test`, [`test/pwa.mjs`](test/pwa.mjs)): the manifest and every icon in it (size and type as claimed; the maskable and iOS icons opaque, and the drawing in the maskable ones inside the safe zone), the links and meta tags in `index.html`, and `sw.js` run against a fake network and cache: it keeps the page and its scripts, shows them offline, takes an update at once, drops a script when a new hash arrives, and falls back to the kept page when the network hangs or answers with an error. Also tried by hand: installed on localhost, server stopped, page reloaded: it opens.
 
 To compare any other site: put its times in a CSV and run `node test/compare-csv.mjs times.csv tel-aviv` (format at the top of [`test/compare-csv.mjs`](test/compare-csv.mjs)).
 
@@ -54,6 +57,7 @@ All the page's text lives in [`i18n.js`](i18n.js), one key per string, the same 
 1. Add the key to **both** `EN` and `HE`: a string with `{placeholders}`, or a function when the grammar needs logic (the Hebrew detail lines pick their verbs by `kind`).
 2. In `index.html` put `data-i18n="your.key"` on the element, or `data-i18n-attr="title:your.key,aria-label:your.key"` for attributes. From the script use `L.t('your.key', { name: value })`, or `L.h(...)` for the help text, which is HTML.
 3. `npm test` fails if a language lacks the key, if a `{placeholder}` differs, or if a title or answer needs a letter the display fonts do not have.
+4. After changing `i18n.js` or `shabbat.js` run `npm run stamp`. It puts the hash of each file in its `<script src="...?v=hash">` in `index.html`: GitHub Pages lets a browser keep a file for 10 minutes, and a new address makes it fetch the new script at once. `npm test` fails while the stamp is out of date.
 
 Styles use logical properties (`inset-inline-end`, `padding-inline-start`, `text-align: start`), so right to left is the exact mirror of left to right; Hebrew-only tweaks (no capitals, no letter spacing) sit under `:lang(he)`. A new language is a new entry in `LANGS` with `dir`, `locale`, its strings and a `format` function for times, dates and durations.
 
@@ -92,7 +96,10 @@ Add it to `PLACES` in `shabbat.js` and it appears in the settings. `havdalahMinu
 - `index.html`: the page (markup, styles, the settings, the "?" panel, the embedded display fonts)
 - `shabbat.js`: the times, holidays, runs and state, no dependencies
 - `i18n.js`: the text in Hebrew and English, and the grammar and formatting each needs
+- `manifest.webmanifest`, `sw.js`, `icons/`: the app: its name and icons, the offline service worker, the icon files
+- `tools/icons.mjs`: draws the icons (SVG and PNG); `tools/stamp.mjs`: puts the script hashes in `index.html` (`npm run stamp`)
 - `test/verify.mjs`: checks against the hebcal library (`npm install && npm test`)
 - `test/i18n.mjs`: checks the text, the Hebrew grammar and the fonts' letters
+- `test/pwa.mjs`: checks the manifest, the icons, the links and the service worker
 - `test/compare-csv.mjs`: checks against a table copied from any website
 - `fonts/`: licenses of the display fonts (SIL Open Font License 1.1)

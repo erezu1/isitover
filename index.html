@@ -296,7 +296,7 @@
 </dialog>
 
 <script src="shabbat.js?v=101401f9"></script>
-<script src="i18n.js?v=2f1a131f"></script>
+<script src="i18n.js?v=100a6e38"></script>
 <script>
 (function () {
   'use strict';
@@ -386,6 +386,7 @@
       kind,
       start: f.when(unit.start, today, S.civilDay),
       end: f.when(unit.end, today, S.civilDay),
+      until: f.when(unit.end, today, S.civilDay, true),                // the end, as it reads after "עד" (Hebrew)
       left: f.span(st.state === 'none' ? unit.start - now : unit.end - now),
       ago: f.span(now - unit.end)
     }));

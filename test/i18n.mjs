@@ -55,11 +55,11 @@ const tags = s => [...new Set([...String(s).matchAll(/<\/?(\w+)/g)].map(m => m[1
 // 4. Functions return text for both kinds of title (feminine for Shabbat, masculine for a holiday).
 {
   const L = I18N.create('he');
-  const p = { start: 'S', end: 'E', left: 'L', ago: 'A' };
+  const p = { start: 'S', end: 'E', until: 'U', left: 'L', ago: 'A' };
   const expect = {
     'detail.in:shabbat': 'נכנסה S · תצא E (בעוד L)', 'detail.in:chag': 'נכנס S · יצא E (בעוד L)',
     'detail.out:shabbat': 'E (לפני A)', 'detail.out:chag': 'E (לפני A)',
-    'detail.none:shabbat': 'תיכנס S (בעוד L) · עד E', 'detail.none:chag': 'יכנס S (בעוד L) · עד E',
+    'detail.none:shabbat': 'תיכנס S (בעוד L) · עד U', 'detail.none:chag': 'יכנס S (בעוד L) · עד U',
   };
   const bad = Object.entries(expect).filter(([k, want]) => { const [key, kind] = k.split(':'); return L.t(key, { ...p, kind }) !== want; });
   report(!bad.length, 'Hebrew detail lines use the right verb forms (נכנסה / תצא / תיכנס for Shabbat, נכנס / יצא / יכנס for a holiday)' +
@@ -108,6 +108,9 @@ const tags = s => [...new Set([...String(s).matchAll(/<\/?(\w+)/g)].map(m => m[1
   const cases = [
     [f.when(t, today, S.civilDay), 'היום ב-19:00'], [f.when(t + DAYMS, today, S.civilDay), 'מחר ב-19:00'], [f.when(t - DAYMS, today, S.civilDay), 'אתמול ב-19:00'],
     [f.when(t + 6 * DAYMS, today, S.civilDay), 'ביום ו׳, 9 באוק׳ ב-19:00'], [f.when(t + 7 * DAYMS, today, S.civilDay), 'בשבת, 10 באוק׳ ב-19:00'],
+    // after "עד" the weekday has no ב in front: עד שבת, 10 באוק׳ ב-19:00 (not עד בשבת)
+    [f.when(t + 6 * DAYMS, today, S.civilDay, true), 'יום ו׳, 9 באוק׳ ב-19:00'], [f.when(t + 7 * DAYMS, today, S.civilDay, true), 'שבת, 10 באוק׳ ב-19:00'],
+    [f.when(t + DAYMS, today, S.civilDay, true), 'מחר ב-19:00'],
     [e.when(t, today, S.civilDay), 'today 19:00'], [e.when(t + 6 * DAYMS, today, S.civilDay), 'Fri 9 Oct 19:00'],
   ];
   const bad3 = cases.filter(([got, want]) => got !== want);

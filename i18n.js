@@ -187,7 +187,7 @@
     'tag.none.shabbat': HE_VERBS.shabbat.willExit, 'tag.none.chag': HE_VERBS.chag.willExit,
     'detail.in': p => HE_VERBS[p.kind].entered + ' ' + p.start + ' · ' + HE_VERBS[p.kind].willExit + ' ' + p.end + ' (בעוד ' + p.left + ')',
     'detail.out': p => p.end + ' (לפני ' + p.ago + ')',                         // the tag already says יצאה / יצא
-    'detail.none': p => HE_VERBS[p.kind].willEnter + ' ' + p.start + ' (בעוד ' + p.left + ') · עד ' + p.end,       // the tag already says תצא / יצא
+    'detail.none': p => HE_VERBS[p.kind].willEnter + ' ' + p.start + ' (בעוד ' + p.left + ') · עד ' + p.until,       // the tag already says תצא / יצא
     'clock': 'עכשיו {time} ב{place}.',
     'sim': 'זמן מדומה: {when}',
     'error': 'הדפדפן הזה לא מצליח לחשב את הזמנים ({message}).',
@@ -242,9 +242,9 @@
   function formatHe(tz) {
     const b = base('he-IL', tz);
     return Object.assign(b, {
-      when(ms, today, civilDay) {                     // היום ב-19:00, מחר ב-19:00, ביום ו׳, 9 באוק׳ ב-17:55
+      when(ms, today, civilDay, bare) {               // היום ב-19:00, מחר ב-19:00, ביום ו׳, 9 באוק׳ ב-17:55 (bare, for after "עד": יום ו׳, 9 באוק׳ ב-17:55)
         const diff = civilDay(ms) - today;
-        return (diff === 0 ? 'היום' : diff === 1 ? 'מחר' : diff === -1 ? 'אתמול' : 'ב' + b.date(ms)) + ' ב-' + b.time(ms);
+        return (diff === 0 ? 'היום' : diff === 1 ? 'מחר' : diff === -1 ? 'אתמול' : (bare ? '' : 'ב') + b.date(ms)) + ' ב-' + b.time(ms);
       },
       span(ms) {                                      // 30 דקות, שעה ושתי דקות, 5 ימים
         const m = Math.round(Math.abs(ms) / MIN);

@@ -13,7 +13,7 @@ let failed = 0;
 const report = (ok, msg) => { console.log((ok ? '  ok  ' : ' FAIL ') + msg); if (!ok) failed++; };
 
 // The places: hebcal's own coordinates and its candle-lighting minutes (Israel 20, Jerusalem 40, Haifa 30, else 18).
-const locations = ['Tel Aviv', 'Jerusalem', 'Haifa', 'Beer Sheva', 'London', 'New York', 'Los Angeles', 'Sydney',
+const locations = ['Tel Aviv', 'Jerusalem', 'Haifa', 'Beer Sheva', 'Petach Tikvah', 'London', 'New York', 'Los Angeles', 'Sydney',
   'Johannesburg', 'Buenos Aires', 'Moscow'].map(n => Location.lookup(n));
 locations.push(new Location(52.37403, 4.88969, false, 'Europe/Amsterdam', 'Amsterdam', 'NL'));
 const candleMinutes = loc => !loc.getIsrael() ? 18 : { Jerusalem: 40, Haifa: 30 }[loc.getName()] ?? 20;
@@ -24,6 +24,20 @@ const placeOf = (loc, style, elevation = 0) => ({
 const range = loc => loc.getName() === 'Tel Aviv' ? [2024, 2099] : [2024, 2040];
 const label = loc => `${loc.getName()} (${loc.getIsrael() ? 'Israel' : 'Diaspora'})`;
 const zmanimOn = (loc, day) => { const [y, m, d] = ymd(day); return new Zmanim(loc, new Date(y, m - 1, d), false); };
+
+// 0. The presets carry hebcal's own coordinates, time zone, Israel flag and (for Israeli places) elevation.
+{
+  const cities = { 'tel-aviv': 'Tel Aviv', 'petah-tikva': 'Petach Tikvah', 'jerusalem': 'Jerusalem', 'haifa': 'Haifa',
+    'beer-sheva': 'Beer Sheva', 'london': 'London', 'new-york': 'New York' };
+  const bad = Object.entries(cities).filter(([key, city]) => {
+    const p = Shabbat.PLACES[key], l = Location.lookup(city);
+    return p.lat !== l.getLatitude() || p.lon !== l.getLongitude() || p.tz !== l.getTzid() || p.israel !== l.getIsrael() ||
+      (p.elevation !== undefined && p.elevation !== l.getElevation());
+  });
+  const extra = Object.keys(Shabbat.PLACES).filter(k => !(k in cities));
+  report(!bad.length, `${Object.keys(cities).length} presets carry hebcal's own coordinates, time zone and Israel flag` +
+    (bad.length ? `  (differ: ${bad.map(b => b[0])})` : '') + (extra.length ? `  (not checked against hebcal: ${extra})` : ''));
+}
 
 // 1. Every single day's times, from hebcal's Zmanim. The sun must agree to the second (hebcal drops the
 //    milliseconds) and the 'hebcal' style must give hebcal's minutes. The 'strict' style, at sea level, must be
@@ -141,8 +155,8 @@ for (const loc of locations) {
   }
   const s = at(tlv, '2026-10-03T12:00:00+03:00'), p = s.period;
   report(clock(p.start) === '2026-10-02 18:04' && clock(p.end) === '2026-10-03 19:00' &&
-         p.names.join('|') === 'Shabbat|Shmini Atzeret / Simchat Torah' && p.hasShabbat && p.hasYomTov &&
-         s.untilEnd === p.end - Date.parse('2026-10-03T12:00:00+03:00') && p.items[1].he === 'שמיני עצרת / שמחת תורה',
+         p.names.join('|') === 'Shabbat|Shmini Atzeret' && p.hasShabbat && p.hasYomTov &&
+         s.untilEnd === p.end - Date.parse('2026-10-03T12:00:00+03:00') && p.items[1].he === 'שמיני עצרת',
          `period: ${clock(p.start)} -> ${clock(p.end)}  ${p.names.join(' + ')}  (${(s.untilEnd / 3600000).toFixed(2)} h to go)`);
   const a = at(ams, '2026-10-03T12:00:00+02:00').period;
   report(clock(a.start, 'Europe/Amsterdam').startsWith('2026-10-02') && clock(a.end, 'Europe/Amsterdam').startsWith('2026-10-04') &&

@@ -145,5 +145,13 @@ const tags = s => [...new Set([...String(s).matchAll(/<\/?(\w+)/g)].map(m => m[1
   report(/<html lang="he" dir="rtl">/.test(html) && /document\.documentElement\.dir/.test(html.slice(0, html.indexOf('<style'))), 'index.html starts as lang="he" dir="rtl" and sets the language from the cookie before the first paint');
 }
 
+// 10. The script URLs in index.html carry the hash of the file, so a browser that cached an older script fetches the new one.
+{
+  const { createHash } = await import('node:crypto');
+  const hash = file => createHash('sha1').update(readFileSync(new URL('../' + file, import.meta.url))).digest('hex').slice(0, 8);
+  const stale = ['shabbat.js', 'i18n.js'].filter(f => !html.includes(`src="${f}?v=${hash(f)}"`));
+  report(!stale.length, 'index.html loads the current shabbat.js and i18n.js (their URLs carry the content hash)' + (stale.length ? `  (out of date: ${stale}; run npm run stamp)` : ''));
+}
+
 console.log(failed ? `\n${failed} check(s) failed` : '\nall checks passed');
 process.exit(failed ? 1 : 0);

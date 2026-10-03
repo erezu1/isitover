@@ -8,14 +8,14 @@
 | It ended earlier today, after nightfall | **כן** | **yes** | `יצאה` / `OUT` · which one · when it ended, how long ago |
 | Neither | **לא** | **not shabat** | `תצא` / `NEXT` · the next one and when it starts |
 
-Holidays are the days on which work is forbidden: Rosh Hashana, Yom Kippur, Sukkot, Shmini Atzeret / Simchat Torah, Pesach (first and seventh days), Shavuot. Back-to-back days (a holiday on Friday, then Shabbat) are one unbroken period. The page works in Tel Aviv time wherever you open it.
+Holidays are the days on which work is forbidden: Rosh Hashana, Yom Kippur, Sukkot, Shmini Atzeret, Pesach (first and seventh days), Shavuot (abroad, the second days too, and Simchat Torah is its own day). Back-to-back days (a holiday on Friday, then Shabbat) are one unbroken period. The page works in Tel Aviv time wherever you open it.
 
 **The Hebrew title** asks about Shabbat while Shabbat is on (**האם יצאה שבת?**), and about the holiday once Shabbat is out but the holiday is still on (**האם יצא החג?**); otherwise it asks about the last one, or the next one if nothing has started. A Saturday that is also a holiday counts as Shabbat. The verbs in the line under the name, and in the tags for "ended" and "next", agree with it: feminine for Shabbat, masculine for a holiday. The tag for "on" is the neutral **בתוקף**. The English title is always "Is it over?" and its line talks about the whole period.
 
 Two buttons at the top (the top right in English, the top left in Hebrew, since the whole layout mirrors), each opening a panel that fades in and out:
 
 - **?** explains how the times are worked out, with the numbers for the period on the page;
-- **gear** has the settings, kept in a cookie on the device: **language** (Hebrew by default), **place** (Tel Aviv by default; Jerusalem, Haifa, Be'er Sheva, Amsterdam, London, New York) and **holidays** (Israel, or Diaspora with second days).
+- **gear** has the settings, kept in a cookie on the device: **language** (Hebrew by default), **place** (Tel Aviv by default; Petah Tikva, Jerusalem, Haifa, Be'er Sheva, Amsterdam, London, New York) and **holidays** (Israel, or Diaspora with second days).
 
 ## How the times are worked out
 
@@ -39,7 +39,7 @@ There is no single official source; the sites differ by up to a minute because t
 
 ## How it was checked
 
-- **hebcal library** (`npm test`, [`test/verify.mjs`](test/verify.mjs)): for Tel Aviv every day 2024-2099, and 11 other places in Israel and abroad 2024-2040: the sun is identical to the second, the `hebcal` style gives hebcal's minutes, every Shabbat and holiday period starts and ends exactly as in hebcal's calendar (Israel and Diaspora, 109,938 days of 1900-2200 for the holiday dates), and "is it on right now?" agrees with hebcal's `isAssurBemlacha()` at 35,000 random moments. Run under five machine time zones. The Shabbat / holiday runs the Hebrew title depends on are checked on Rosh Hashana, Shavuot and every period 2024-2099.
+- **hebcal library** (`npm test`, [`test/verify.mjs`](test/verify.mjs)): for Tel Aviv every day 2024-2099, and 12 other places in Israel and abroad 2024-2040: the sun is identical to the second, the `hebcal` style gives hebcal's minutes, every Shabbat and holiday period starts and ends exactly as in hebcal's calendar (Israel and Diaspora, 109,938 days of 1900-2200 for the holiday dates), and "is it on right now?" agrees with hebcal's `isAssurBemlacha()` at 35,000 random moments. Run under five machine time zones. The Shabbat / holiday runs the Hebrew title depends on are checked on Rosh Hashana, Shavuot and every period 2024-2099.
 - **hebcal.com website** (its public REST API, Tel Aviv, 2026-2027): all 110 Havdalah times and all 112 candle lightings identical to the `hebcal` style (its two second-night Rosh Hashana lightings, after nightfall, set aside). Against the default `strict` style every time is within a minute.
 - **yeshiva.org.il**, Tel Aviv, Hebrew year 5787 (12 Sep 2026 to 25 Sep 2027, 60 Shabbat and holiday days), compared once by hand: the same end of Shabbat on **59 of 59** rows and the same candle lighting on 58 of 59. The rest are a minute off. The same table's Rabbeinu Tam column (`havdalahMinutes: 72` in the code, not offered on the page) matches on 58 of 59. The table is theirs, so it is not in this repo. One Jerusalem Shabbat checked too: end and Rabbeinu Tam the same, candle lighting a minute earlier than theirs.
 - **US Naval Observatory** (its sunrise and sunset API), 12 dates across the year: sunset and the 6°-below-horizon time within 29 seconds, which is their own whole-minute rounding.
@@ -68,7 +68,7 @@ const s = tlv.status(Date.now());
 s.state;                  // 'in' | 'out' | 'none'
 s.kind;                   // 'shabbat' | 'chag': what a question about it should be about
 s.segment;                // that run of days: { kind, start, end, names, items, days }
-s.period.names;           // ['Shabbat', 'Shmini Atzeret / Simchat Torah']: which one it is, or was
+s.period.names;           // ['Shabbat', 'Shmini Atzeret']: which one it is, or was
 s.period.items;           // the same with ids, Hebrew names, kind ('shabbat' | 'yomtov')
 s.period.start;           // candle lighting, ms since the epoch
 s.period.end;             // Havdalah

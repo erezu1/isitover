@@ -36,8 +36,10 @@
   }
   :root {
     --bg: #faf8f4; --fg: #1d1b17; --muted: #6a655b; --line: #e3ddd0;
-    --yes: #146c36; --no: #a84a07; --none: #475569;
-    --yes-bg: #dcf2e3; --no-bg: #fbe8d2; --none-bg: #e8e6df; --accent: #1d1b17; --on-accent: #faf8f4;
+    --yes: #15803d; --no: #dc2626; --none: #475569;                       /* the big answers: a real red and a real green */
+    --yes-ink: #166534; --no-ink: #b91c1c;                                /* the same, darker, for the small tags */
+    --yes-bg: #dcfce7; --no-bg: #fee2e2; --none-bg: #e8e6df; --accent: #1d1b17; --on-accent: #faf8f4;
+    --warn: #a84a07; --warn-bg: #fbe8d2;                                  /* the "simulated time" banner */
     --display: "Syne Display", system-ui, -apple-system, "Segoe UI", sans-serif; --display-weight: 800;
   }
   :root:lang(he) {
@@ -46,8 +48,10 @@
   @media (prefers-color-scheme: dark) {
     :root {
       --bg: #13120e; --fg: #f2eee5; --muted: #a39d90; --line: #2a2822;
-      --yes: #6ee09a; --no: #ffb066; --none: #a5b0c0;
-      --yes-bg: #16301f; --no-bg: #3a2612; --none-bg: #25231d; --accent: #f2eee5; --on-accent: #13120e;
+      --yes: #4ade80; --no: #f87171; --none: #a5b0c0;
+      --yes-ink: #4ade80; --no-ink: #f87171;
+      --yes-bg: #14351f; --no-bg: #3f1618; --none-bg: #25231d; --accent: #f2eee5; --on-accent: #13120e;
+      --warn: #ffb066; --warn-bg: #3a2612;
     }
   }
   * { box-sizing: border-box; }
@@ -86,13 +90,13 @@
   .answer.none { color: var(--none); }
   .status { margin: .5rem 0 0; font-size: 1.2rem; font-weight: 600; display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; }
   .pill { font-size: .75rem; font-weight: 700; letter-spacing: .08em; padding: .15rem .6rem; border-radius: 999px; }
-  .pill.in { background: var(--no-bg); color: var(--no); }
-  .pill.out { background: var(--yes-bg); color: var(--yes); }
+  .pill.in { background: var(--no-bg); color: var(--no-ink); }
+  .pill.out { background: var(--yes-bg); color: var(--yes-ink); }
   .pill.none { background: var(--none-bg); color: var(--none); }
   .detail { margin: .2rem 0 0; color: var(--muted); }
   footer { margin-top: 2.5rem; color: var(--muted); font-size: .85rem; }
   footer p { margin: .3rem 0; }
-  .sim { display: inline-block; margin: 0 0 1rem; padding: .2rem .6rem; border-radius: 6px; background: var(--no-bg); color: var(--no); font-size: .85rem; font-weight: 600; }
+  .sim { display: inline-block; margin: 0 0 1rem; padding: .2rem .6rem; border-radius: 6px; background: var(--warn-bg); color: var(--warn); font-size: .85rem; font-weight: 600; }
   .sim[hidden] { display: none; }
 
   /* the two panels fade in and out */
@@ -207,8 +211,8 @@
   <div class="info" id="helpBody"></div>
 </dialog>
 
-<script src="shabbat.js"></script>
-<script src="i18n.js"></script>
+<script src="shabbat.js?v=101401f9"></script>
+<script src="i18n.js?v=8a39765d"></script>
 <script>
 (function () {
   'use strict';

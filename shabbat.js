@@ -9,7 +9,7 @@
  *                 'none'  neither; s.period is then the next one
  *   s.period      the one that is on, that just ended, or that comes next:
  *                   start, end            instants in ms: candle lighting, Havdalah
- *                   names                 ['Shabbat', 'Shmini Atzeret / Simchat Torah']
+ *                   names                 ['Shabbat', 'Shmini Atzeret']
  *                   items                 the same with ids, Hebrew names and kind ('shabbat' | 'yomtov')
  *                   days                  [{ day, items }] for each rest day, with the day of the festival
  *                   segments              the same period cut into runs of one kind (below)
@@ -119,7 +119,6 @@
     'pesach': ['Pesach', 'פסח'],
     'shavuot': ['Shavuot', 'שבועות']
   };
-  const ISRAEL_NAMES = { 'shmini-atzeret': ['Shmini Atzeret / Simchat Torah', 'שמיני עצרת / שמחת תורה'] };
 
   // Days when work is forbidden: [anchor, days from it, festival, day of the festival, kept in Israel?].
   // Anchor 'rh' is Rosh Hashana of the Hebrew year, 'next' that of the following year; from 1 Nisan to the next
@@ -150,17 +149,17 @@
   }
 
   const weekday = day => (((day + 4) % 7) + 7) % 7;   // 0 = Sunday ... 6 = Saturday
-  function makeItem(id, n, israel) {
-    const names = (israel && ISRAEL_NAMES[id]) || NAMES[id];
+  function makeItem(id, n) {
+    const names = NAMES[id];
     return { id, en: names[0], he: names[1], kind: id === 'shabbat' ? 'shabbat' : 'yomtov', day: n };
   }
   function itemsOn(day, israel) {                     // [] on an ordinary day
     const items = [];
-    if (weekday(day) === 6) items.push(makeItem('shabbat', null, israel));
+    if (weekday(day) === 6) items.push(makeItem('shabbat', null));
     const g = new Date(day * DAY).getUTCFullYear();
     for (const Y of [g + 3760, g + 3761]) {
       const f = festivals(Y, israel).get(day);
-      if (f) items.push(makeItem(f[0], f[1], israel));
+      if (f) items.push(makeItem(f[0], f[1]));
     }
     return items;
   }
@@ -171,6 +170,7 @@
   // `name` is English and `nameHe` Hebrew; add both for a new place.
   const PLACES = {
     'tel-aviv':   { name: 'Tel Aviv',    nameHe: 'תל אביב',   lat: 32.08088, lon: 34.78057,  tz: 'Asia/Jerusalem',   israel: true,  elevation: 15,  candleMinutes: 20 },
+    'petah-tikva': { name: 'Petah Tikva', nameHe: 'פתח תקווה', lat: 32.08707, lon: 34.88747, tz: 'Asia/Jerusalem',   israel: true,  elevation: 54,  candleMinutes: 20 },
     'jerusalem':  { name: 'Jerusalem',   nameHe: 'ירושלים',   lat: 31.76904, lon: 35.21633,  tz: 'Asia/Jerusalem',   israel: true,  elevation: 786, candleMinutes: 40 },
     'haifa':      { name: 'Haifa',       nameHe: 'חיפה',      lat: 32.81841, lon: 34.9885,   tz: 'Asia/Jerusalem',   israel: true,  elevation: 40,  candleMinutes: 30 },
     'beer-sheva': { name: "Be'er Sheva", nameHe: 'באר שבע',   lat: 31.25181, lon: 34.7913,   tz: 'Asia/Jerusalem',   israel: true,  elevation: 285, candleMinutes: 20 },

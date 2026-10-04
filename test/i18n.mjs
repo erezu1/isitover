@@ -59,7 +59,7 @@ const tags = s => [...new Set([...String(s).matchAll(/<\/?(\w+)/g)].map(m => m[1
   const expect = {
     'detail.in:shabbat': 'נכנסה S · תצא E (בעוד L)', 'detail.in:chag': 'נכנס S · יצא E (בעוד L)',
     'detail.out:shabbat': 'E (לפני A)', 'detail.out:chag': 'E (לפני A)',
-    'detail.none:shabbat': 'תיכנס S (בעוד L) · עד U', 'detail.none:chag': 'יכנס S (בעוד L) · עד U',
+    'detail.none:shabbat': 'S (בעוד L) · עד U', 'detail.none:chag': 'S (בעוד L) · עד U',
   };
   const bad = Object.entries(expect).filter(([k, want]) => { const [key, kind] = k.split(':'); return L.t(key, { ...p, kind }) !== want; });
   report(!bad.length, 'Hebrew detail lines use the right verb forms (נכנסה / תצא / תיכנס for Shabbat, נכנס / יצא / יכנס for a holiday)' +
@@ -79,9 +79,9 @@ const tags = s => [...new Set([...String(s).matchAll(/<\/?(\w+)/g)].map(m => m[1
   const L = I18N.create('he'), En = I18N.create('en');
   const want = [
     [L.t('title.shabbat'), 'האם יצאה שבת?'], [L.t('title.chag'), 'האם יצא החג?'],
-    [L.t('answer.in'), 'לא'], [L.t('answer.out'), 'כן'], [L.t('answer.none'), 'לא'],
-    [L.t('tag.in.shabbat'), 'בתוקף'], [L.t('tag.out.shabbat'), 'יצאה'], [L.t('tag.none.shabbat'), 'תצא'],
-    [L.t('tag.in.chag'), 'בתוקף'], [L.t('tag.out.chag'), 'יצא'], [L.t('tag.none.chag'), 'יצא'],
+    [L.t('answer.in'), 'לא'], [L.t('answer.out'), 'כן'], [L.t('answer.none'), 'כן'],
+    [L.t('tag.in.shabbat'), 'בתוקף'], [L.t('tag.out.shabbat'), 'יצאה'], [L.t('tag.none.shabbat'), 'תיכנס'],
+    [L.t('tag.in.chag'), 'בתוקף'], [L.t('tag.out.chag'), 'יצא'], [L.t('tag.none.chag'), 'יכנס'],
     [En.t('title.shabbat'), 'Is it over?'], [En.t('title.chag'), 'Is it over?'],
     [En.t('answer.in'), 'no'], [En.t('answer.out'), 'yes'], [En.t('answer.none'), 'not shabat'],
     [L.t('clock', { time: '19:35', place: 'תל אביב' }), 'עכשיו 19:35 בתל אביב.'], [En.t('clock', { time: '19:35', place: 'Tel Aviv' }), 'It’s 19:35 in Tel Aviv.'],

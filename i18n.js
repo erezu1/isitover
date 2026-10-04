@@ -180,13 +180,13 @@
     'title.chag': 'האם יצא החג?',
     'answer.in': 'לא',
     'answer.out': 'כן',
-    'answer.none': 'לא',
+    'answer.none': 'כן',
     'tag.in.shabbat': 'בתוקף', 'tag.in.chag': 'בתוקף',
     'tag.out.shabbat': HE_VERBS.shabbat.exited, 'tag.out.chag': HE_VERBS.chag.exited,
-    'tag.none.shabbat': HE_VERBS.shabbat.willExit, 'tag.none.chag': HE_VERBS.chag.willExit,
+    'tag.none.shabbat': HE_VERBS.shabbat.willEnter, 'tag.none.chag': HE_VERBS.chag.willEnter,
     'detail.in': p => HE_VERBS[p.kind].entered + ' ' + p.start + ' · ' + HE_VERBS[p.kind].willExit + ' ' + p.end + ' (בעוד ' + p.left + ')',
     'detail.out': p => p.end + ' (לפני ' + p.ago + ')',                         // the tag already says יצאה / יצא
-    'detail.none': p => HE_VERBS[p.kind].willEnter + ' ' + p.start + ' (בעוד ' + p.left + ') · עד ' + p.until,       // the tag already says תצא / יצא
+    'detail.none': p => p.start + ' (בעוד ' + p.left + ') · עד ' + p.until,       // the tag already says תיכנס / יכנס
     'clock': 'עכשיו {time} ב{place}.',
     'sim': 'זמן מדומה: {when}',
     'error': 'הדפדפן הזה לא מצליח לחשב את הזמנים ({message}).',
